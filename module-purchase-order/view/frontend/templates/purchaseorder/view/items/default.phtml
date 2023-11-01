@@ -1,0 +1,106 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var $block \Magento\Checkout\Block\Cart\Item\Renderer
+ * @var $viewModel \Magento\PurchaseOrder\ViewModel\Quote\Items
+ * @var $escaper \Magento\Framework\Escaper
+ */
+
+$viewModel = $block->getViewModel();
+$item = $block->getItem();
+$product = $item->getProduct();
+$isVisibleProduct = $product->isVisibleInSiteVisibility();
+
+$helper = $viewModel->getMsrpDataHelper();
+$canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinimalPriceLessMsrp($product);
+
+$baseCurrency = $item->getQuote()->getCurrency()->getBaseCurrencyCode();
+$quoteCurrency = $item->getQuote()->getCurrency()->getQuoteCurrencyCode();
+$productUrl = $block->hasProductUrl() ? $block->getProductUrl() : '';
+?>
+<tbody class="cart item">
+    <tr class="item-info">
+        <td data-th="<?= $escaper->escapeHtml(__('Product Name')) ?>" class="col item">
+            <?php if ($block->hasProductUrl()): ?>
+                <a href="<?= $escaper->escapeHtml($productUrl) ?>"
+                   title="<?= $escaper->escapeHtml($block->getProductName()) ?>"
+                   tabindex="-1"
+                   class="product-item-photo"></a>
+            <?php else: ?>
+                <span class="product-item-photo"></span>
+            <?php endif; ?>
+            <div class="product-item-details">
+                <strong class="product-item-name">
+                    <?php if ($block->hasProductUrl()): ?>
+                        <a href="<?= $escaper->escapeHtml($productUrl) ?>">
+                            <?= $escaper->escapeHtml($block->getProductName()) ?>
+                        </a>
+                    <?php else: ?>
+                        <?= $escaper->escapeHtml($block->getProductName()) ?>
+                    <?php endif; ?>
+                </strong>
+                <?php if ($options = $block->getOptionList()): ?>
+                    <dl class="item-options">
+                        <?php foreach ($options as $option): ?>
+                            <?php $formattedOptionValue = $block->getFormatedOptionValue($option) ?>
+                            <dt><?= $escaper->escapeHtml($option['label']) ?></dt>
+                            <dd<?= (isset($formattedOptionValue['full_view']) ? ' class="tooltip wrapper"' : '') ?>>
+                                <?= $escaper->escapeHtml($formattedOptionValue['value'], ['a', 'img']) ?>
+                                <?php if (isset($formattedOptionValue['full_view'])): ?>
+                                    <div class="tooltip content">
+                                        <dl class="item options">
+                                            <dt><?= $escaper->escapeHtml($option['label']) ?></dt>
+                                            <dd><?= $escaper->escapeHtml($formattedOptionValue['full_view']) ?></dd>
+                                        </dl>
+                                    </div>
+                                <?php endif; ?>
+                            </dd>
+                        <?php endforeach; ?>
+                    </dl>
+                <?php endif; ?>
+                <?php $messagesBlock = $block->getLayout()->getBlock('checkout.cart.item.renderers.messages'); ?>
+                <?php if ($messagesBlock): ?>
+                    <?php $messagesBlock->setItemMessages($block->getMessages()); ?>
+                    <?= $messagesBlock->toHtml(); ?>
+                <?php endif; ?>
+                <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+                <?php if ($addInfoBlock): ?>
+                    <?= $addInfoBlock->setItem($item)->toHtml() ?>
+                <?php endif; ?>
+            </div>
+        </td>
+        <td class="col sku" data-th="<?= $escaper->escapeHtml(__('SKU')) ?>">
+            <?= $escaper->escapeHtml($product->getSku()) ?>
+        </td>
+        <td class="col price" data-th="<?= $escaper->escapeHtml(__('Price')) ?>">
+            <?= $escaper->escapeHtml(
+                $viewModel->getPriceFormatter()->getFormattedCatalogPrice($item, $quoteCurrency, $baseCurrency),
+                ['span']
+            ) ?>
+        </td>
+        <td class="col qty" data-th="<?= $escaper->escapeHtml(__('Qty')) ?>">
+            <div class="field qty">
+                <label class="label" for="cart-<?= $escaper->escapeHtml($item->getId()) ?>-qty">
+                    <span><?= $escaper->escapeHtml(__('Qty')) ?></span>
+                </label>
+                <div class="control qty">
+                    <span><?= $escaper->escapeHtml($block->getQty()) ?></span>
+                </div>
+            </div>
+        </td>
+        <td class="col subtotal" data-th="<?= $escaper->escapeHtml(__('Subtotal')) ?>">
+            <?php if ($canApplyMsrp): ?>
+                <span class="cart msrp subtotal">--</span>
+            <?php else: ?>
+                <?= $escaper->escapeHtml(
+                    $viewModel->getPriceFormatter()->getItemTotal($item, $quoteCurrency, $baseCurrency),
+                    ['span']
+                ) ?>
+            <?php endif; ?>
+        </td>
+    </tr>
+</tbody>

@@ -1,0 +1,43 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var Magento\PurchaseOrder\Block\PurchaseOrder\Totals $block
+ * @var Magento\Framework\Escaper $escaper
+ */
+?>
+<?php foreach ($block->getTotals() as $code => $total): ?>
+    <?php if ($total->getBlockName()): ?>
+        <?= $block->getChildHtml($total->getBlockName(), false) ?>
+    <?php else: ?>
+        <?php $style = ($total->getStyle() ? ' ' . $total->getStyle() : ''); ?>
+        <tr class="<?= $escaper->escapeHtml($code . $style) ?>">
+            <th <?= $escaper->escapeHtml($block->getLabelProperties()) ?> scope="row">
+                <?php if ($total->getStrong()): ?>
+                    <strong><?= $escaper->escapeHtml($total->getLabel()) ?></strong>
+                <?php else: ?>
+                    <?= $escaper->escapeHtml($total->getLabel()) ?>
+                <?php endif; ?>
+            </th>
+            <td <?= $escaper->escapeHtml($block->getValueProperties()) ?>
+                    data-th="<?= $escaper->escapeHtml($total->getLabel()) ?>">
+                <?php if ($total->getStrong()): ?>
+                    <strong>
+                <?php endif; ?>
+                <?php
+                    $formattedPriced = $block->formatPrice(
+                        $total->getValue(),
+                        $total->getCurrency() ?: $block->getQuote()->getQuoteCurrencyCode()
+                    );
+                ?>
+                <?= $escaper->escapeHtml($formattedPriced, ['span']) ?>
+                <?php if ($total->getStrong()): ?>
+                    </strong>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+<?php endforeach ?>

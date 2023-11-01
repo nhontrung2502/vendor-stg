@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAddCommentPurchaseOrderTest" extends="StorefrontApproveSubordinatePurchaseOrderTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Add a Comment to a Purchase Order"/>
+            <description value="Verify that an administrator can add a comment to a Purchase Order"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-34252"/>
+            <useCaseId value="B2B-486"/>
+            <group value="purchase_orders"/>
+        </annotations>
+        <!-- Verify the Comment tab is empty on initial load -->
+        <actionGroup ref="StorefrontNavigateToPurchaseOrderCommentTabActionGroup" stepKey="navigationToCommentTabBeforeComment" after="navigateToViewPurchaseOrderPage"/>
+        <actionGroup ref="StorefrontValidateCommentTabEmptyActionGroup" stepKey="validateCommentTabIsEmpty" after="navigationToCommentTabBeforeComment"/>
+        <!-- Verify the "Add Comment" button is disabled when the text area is empty -->
+        <actionGroup ref="StorefrontValidateAddCommentButtonIsDisabledActionGroup" stepKey="validateAddCommentButtonDisabled" after="validateCommentTabIsEmpty" />
+        <!-- Write an admin comment into the comment text area and submit -->
+        <actionGroup ref="StorefrontWriteCommentInPurchaseOrderActionGroup" stepKey="writeAdminComment" after="validateAddCommentButtonDisabled">
+            <argument name="comment" value="{{PurchaseOrderAdminComment.comment}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontClickAddCommentButtonActionGroup" stepKey="addCommentToPurchaseOrder" after="writeAdminComment"/>
+        <generateDate date="now" format="M j, Y, g:" stepKey="addCommentTime" after="addCommentToPurchaseOrder"/>
+        <!-- Verify Manual comment on Tab -->
+        <actionGroup ref="StorefrontNavigateToPurchaseOrderCommentTabActionGroup" stepKey="navigationToCommentTabToVerifyAdminComment" after="addCommentTime"/>
+        <actionGroup ref="StorefrontVerifyCommentMessageActionGroup" stepKey="checkAdminComment" after="navigationToCommentTabToVerifyAdminComment">
+            <argument name="index" value="1"/>
+            <argument name="commentMessage" value='{{PurchaseOrderAdminComment.comment}}'/>
+            <argument name="date" value="{$addCommentTime}"/>
+        </actionGroup>
+        <!-- Verify only 1 comment present -->
+        <actionGroup ref="StorefrontValidateCommentCountInCommentTabActionGroup" stepKey="verifySingleComment" after="checkAdminComment">
+            <argument name="commentCount" value="1" />
+        </actionGroup>
+        <!-- Verify 2 comments after approval comment is added and original admin comment is present -->
+        <actionGroup ref="StorefrontValidateCommentCountInCommentTabActionGroup" stepKey="verifyTwoComments" after="checkComment">
+            <argument name="commentCount" value="2" />
+        </actionGroup>
+        <actionGroup ref="StorefrontVerifyCommentMessageActionGroup" stepKey="checkAdminCommentAfterApproval" after="verifyTwoComments">
+            <argument name="index" value="2"/>
+            <argument name="commentMessage" value='{{PurchaseOrderAdminComment.comment}}'/>
+            <argument name="date" value="{$addCommentTime}"/>
+        </actionGroup>
+    </test>
+</tests>

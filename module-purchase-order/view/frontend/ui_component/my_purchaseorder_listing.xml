@@ -1,0 +1,140 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">my_purchaseorder_listing.my_purchaseorder_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>purchaseorder_listing_columns</spinner>
+        <deps>
+            <dep>my_purchaseorder_listing.my_purchaseorder_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="purchaseorder_listing_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                <item name="storageConfig" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                </item>
+            </item>
+        </argument>
+        <settings>
+            <storageConfig>
+                <param name="cacheRequests" xsi:type="boolean">false</param>
+            </storageConfig>
+            <updateUrl path="purchaseorder/ui/render"/>
+        </settings>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+                      name="my_purchaseorder_listing_data_source">
+            <settings>
+                <primaryFieldName>entity_id</primaryFieldName>
+                <requestFieldName>id</requestFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <columns name="purchaseorder_listing_columns" component="uiB2bListing">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="table_css_class" xsi:type="string">data table</item>
+            </item>
+        </argument>
+        <settings>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">
+                        my_purchaseorder_listing.my_purchaseorder_listing.purchaseorder_columns_editor
+                    </item>
+                    <item name="target" xsi:type="string">startEdit</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+                        <item name="1" xsi:type="boolean">true</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+        <column name="increment_id" sortOrder="10">
+            <settings>
+                <label translate="true">PO #</label>
+            </settings>
+        </column>
+        <column name="order_increment_id" sortOrder="20">
+            <settings>
+                <label translate="true">Order #</label>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date"
+                sortOrder="30">
+            <settings>
+                <dataType>date</dataType>
+                <label translate="true">Created</label>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date"
+                sortOrder="40">
+            <settings>
+                <dataType>date</dataType>
+                <label translate="true">Updated</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="creator_name" sortOrder="50">
+            <settings>
+                <label translate="true">Created By</label>
+            </settings>
+        </column>
+        <column name="status" sortOrder="60" component="Magento_Ui/js/grid/columns/select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">main_table.status</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>select</dataType>
+                <editor>
+                    <editorType>select</editorType>
+                </editor>
+                <label translate="true">Status</label>
+                <options class="Magento\PurchaseOrder\Model\Config\Source\Status"/>
+            </settings>
+        </column>
+        <column name="grand_total" class="Magento\PurchaseOrder\Ui\Component\Listing\Column\Price" sortOrder="80">
+            <settings>
+                <label>Total</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Magento\PurchaseOrder\Ui\Component\Listing\Column\Actions" sortOrder="90">
+            <settings>
+                <fieldClass>
+                    <class name="col actions">true</class>
+                </fieldClass>
+                <indexField>entity_id</indexField>
+                <sortable>false</sortable>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
+    </columns>
+    <container name="listing_top">
+        <paging name="listing_paging" component="uiB2bPaging">
+            <settings>
+                <selectProvider>my_purchaseorder_listing.my_purchaseorder_listing.purchaseorder_listing_columns.ids</selectProvider>
+                <storageConfig>
+                    <namespace>current.paging</namespace>
+                    <provider>my_purchaseorder_listing.my_purchaseorder_listing.listing_top.bookmarks</provider>
+                </storageConfig>
+            </settings>
+        </paging>
+    </container>
+</listing>

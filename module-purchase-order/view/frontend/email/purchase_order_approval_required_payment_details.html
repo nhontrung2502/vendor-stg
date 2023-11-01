@@ -1,0 +1,53 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!--@subject {{trans "Purchase Order #%increment_id has been Created and has been sent for approval" increment_id=$data.purchase_order_increment_id}} @-->
+<!--@vars {
+"var store":"Store",
+"var data.purchase_order_increment_id":"Purchase Order Increment Id",
+"var data.purchase_order_id":"Purchase Order Id",
+"var data.recipient_full_name":"Recipient Full Name",
+"var data.approvers_full_names":"Approvers Full Names",
+"var data.quote_id":"Quote Id",
+"var data.quote_name":"Quote Name",
+"var this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])":"Purchase Order View Url",
+"var this.getUrl($store,'negotiable_quote/quote/view/',[_nosid:1,quote_id:$data.quote_id])":"Quote View Url"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table width="100%">
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans "%recipient_full_name," recipient_full_name=$data.recipient_full_name}}</p>
+            <p>
+                {{if data.quote_name}}
+                    {{trans "Purchase Order <a href="%purchase_order_view_url">#%increment_id</a> has been created based on your quote <a href="%quote_view_url">%quote_name</a>"
+                        increment_id=$data.purchase_order_increment_id
+                        purchase_order_view_url=$this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])
+                        quote_name=$data.quote_name
+                        quote_view_url=$this.getUrl($store,'negotiable_quote/quote/view/',[_nosid:1,quote_id:$data.quote_id])
+                    |raw}}
+                    {{trans "and is being processed."}}
+                {{else}}
+                    {{trans "Your Purchase Order <a href="%purchase_order_view_url">#%increment_id</a>"
+                        increment_id=$data.purchase_order_increment_id
+                        purchase_order_view_url=$this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])
+                    |raw}}
+                    {{trans "is currently being processed."}}
+                {{/if}}
+            </p>
+            <p>
+                {{trans "Your Purchase Order requires approval from:"}}
+                {{block class='Magento\\Framework\\View\\Element\\Template' area='frontend' template='Magento_PurchaseOrderRule::email/approvers.phtml' approvers=$data.approvers_full_names}}
+                {{trans "You will receive an email at each approval stage. You will be asked to enter your payment details after the purchase order has been approved."}}
+            </p>
+        </td>
+    </tr>
+    {{layout handle="email_purchaseorder_details" area="frontend" purchaseOrderId=$data.purchase_order_id}}
+</table>
+
+{{template config_path="design/email/footer_template"}}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontClickPlaceOrderLinkInBannerActionGroup">
+        <annotations>
+            <description>Clicks the Place Order link in the banner on the Purchase Order Details page when a purchase order is in the 'Approved - Pending Payment' status.</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.placeOrderBannerLink}}" stepKey="waitForPlaceOrderBannerLink" />
+        <click selector="{{StorefrontPurchaseOrderViewSection.placeOrderBannerLink}}" stepKey="clickPlaceOrderLink"/>
+        <waitForPageLoad stepKey="waitForCheckoutPage" />
+        <seeInTitle stepKey="seeCheckoutInTitle" userInput="Checkout"/>
+    </actionGroup>
+</actionGroups>

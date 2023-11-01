@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontApprovePurchaseOrderActionGroup">
+        <annotations>
+            <description>Approves a purchase order on the storefront and verifies status change. Must be on the View Purchase Order page</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderApproveButton}}" stepKey="waitForButton"/>
+        <click selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderApproveButton}}" stepKey="clickButton"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <waitForElementVisible selector="{{StorefrontMessagesSection.success}}" stepKey="waitForSuccessMessage"/>
+        <see userInput="Purchase order has been successfully approved." selector="{{StorefrontMessagesSection.success}}" stepKey="seeSuccessMessage"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderStatus(PurchaseOrderStatuses.approved)}}" stepKey="waitForStatusChange"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderApproveButton}}" stepKey="verifyApproveNotAvailable"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderRejectButton}}" stepKey="verifyRejectNotAvailable"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderCancelButton}}" stepKey="verifyCancelNotAvailable"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.placeOrderButton}}" stepKey="verifyPlaceOrderNotAvailable"/>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- PO place with payment information saving -->
+    <route url="/V1/carts/mine/po-payment-information" method="POST">
+        <service class="Magento\PurchaseOrder\Api\PurchaseOrderPaymentInformationManagementInterface"
+                 method="savePaymentInformationAndPlacePurchaseOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <!-- Managing Payment Methods -->
+    <route url="/V1/purchase-order-carts/:cartId/set-payment-information" method="POST">
+        <service class="Magento\Checkout\Api\PaymentInformationManagementInterface" method="savePaymentInformation"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/purchase-order-carts/:cartId/payment-information" method="POST">
+        <service class="Magento\Checkout\Api\PaymentInformationManagementInterface" method="savePaymentInformationAndPlaceOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/purchase-order-carts/:cartId/payment-information" method="GET">
+        <service class="Magento\Checkout\Api\PaymentInformationManagementInterface" method="getPaymentInformation"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <!-- Managing Shipping Methods -->
+    <route url="/V1/purchase-order-carts/:cartId/estimate-shipping-methods" method="POST">
+        <service class="Magento\Quote\Api\ShipmentEstimationInterface" method="estimateByExtendedAddress"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/purchase-order-carts/:cartId/estimate-shipping-methods-by-address-id" method="POST">
+        <service class="Magento\Quote\Api\ShippingMethodManagementInterface" method="estimateByAddressId"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <!-- Managing Cart Total -->
+    <route url="/V1/purchase-order-carts/:cartId/totals" method="GET">
+        <service class="Magento\Quote\Api\CartTotalRepositoryInterface" method="get"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <!-- Managing giftcards from quote -->
+    <route url="/V1/purchase-order-carts/:cartId/giftCards" method="POST">
+        <service class="Magento\GiftCardAccount\Api\GiftCardAccountManagementInterface" method="saveByQuoteId"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/purchase-order-carts/:cartId/giftCards/:giftCardCode" method="DELETE">
+        <service class="Magento\GiftCardAccount\Api\GiftCardAccountManagementInterface" method="deleteByQuoteId"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <!-- Managing Cart Billing address -->
+    <route url="/V1/purchase-order-carts/:cartId/billing-address" method="POST">
+        <service class="Magento\Quote\Api\BillingAddressManagementInterface" method="assign"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+</routes>

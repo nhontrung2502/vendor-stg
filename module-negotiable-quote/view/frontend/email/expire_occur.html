@@ -1,0 +1,19 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject Your Quote {{var data.quote_name}} has expired @-->
+<!--@vars {
+"var store.frontend_name":"Store Frontend Name",
+"var data.quote_name":"Quote Name",
+"var data.customer_name":"Customer Name",
+"var frontend_quote_url":"Quote URL"
+} @-->
+
+<p class="greeting">Dear {{trans "%customer_name," customer_name=$data.customer_name}}</p>
+<p>Unfortunately, your Quote <a href="{{var frontend_quote_url}}">#{{trans "%quote_id" quote_id=$data.quote_name}}</a>
+    has expired.</p>
+<p>After the expiration, you’ll have to negotiate the price with the seller again.</p>
+<br /><p>{{trans "Thank you,"}}</p><p>{{trans "%store_name" store_name=$store.frontend_name |raw}}</p>

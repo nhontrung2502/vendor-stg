@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontPurchaseApprovedSubordinatePurchaseOrderTest" extends="StorefrontApproveSubordinatePurchaseOrderTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Purchase Approved Subordinate's Purchase Order"/>
+            <description value="Verify that an admin can place an order for an approved subordinate's purchase order"/>
+            <severity value="BLOCKER"/>
+            <testCaseId value="MC-32885"/>
+            <useCaseId value="B2B-309, B2B-362"/>
+            <group value="purchase_orders"/>
+        </annotations>
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutApprover"/>
+        <!-- Login as Company Admin and Place Approved Order -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontNavigateToCompanyPurchaseOrdersPageActionGroup" stepKey="navigateToCompanyPurchaseOrdersPageAsAdmin"/>
+        <actionGroup ref="StorefrontNavigateToViewPurchaseOrderPageActionGroup" stepKey="navigateToViewPurchaseOrderPageAsAdmin">
+            <argument name="tabName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderId"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontWriteCommentInPurchaseOrderActionGroup" stepKey="writePlaceOrderCommentOnPurchaseOrder">
+            <argument name="comment" value="{{PurchaseOrderPlaceOrderComment.comment}}" />
+        </actionGroup>
+        <actionGroup ref="StorefrontPlacePurchaseOrderActionGroup" stepKey="placePurchaseOrderAsAdmin">
+            <argument name="purchaseOrderNumber" value="$purchaseOrderId"/>
+        </actionGroup>
+        <generateDate date="now" format="M j, Y, g:" stepKey="orderCreatedTime"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderViewSection.orderNumber}}" stepKey="orderNumber"/>
+        <!-- Verify Purchase Order Status in History tab -->
+        <actionGroup ref="StorefrontNavigateToPurchaseOrderHistoryLogTabActionGroup" stepKey="NavigateToHistoryLogTab2"/>
+        <actionGroup ref="StorefrontVerifyHistoryLogMessageActionGroup" stepKey="checkOrderHistoryLog">
+            <argument name="index" value="1"/>
+            <argument name="logMessage" value="Successfully created Order $orderNumber from Purchase Order #$purchaseOrderId By {{CompanyAdminUser.fullname}}"/>
+            <argument name="date" value="{$orderCreatedTime}"/>
+        </actionGroup>
+        <!-- Verify Comment on Comments tab -->
+        <actionGroup ref="StorefrontNavigateToPurchaseOrderCommentTabActionGroup" stepKey="navigationPlaceOrderToCommentTab" />
+        <actionGroup ref="StorefrontVerifyCommentMessageActionGroup" stepKey="checkPlaceOrderComment">
+            <argument name="index" value="1"/>
+            <argument name="commentMessage" value='{{PurchaseOrderPlaceOrderComment.comment}}'/>
+            <argument name="date" value="{$orderCreatedTime}"/>
+        </actionGroup>
+    </test>
+</tests>

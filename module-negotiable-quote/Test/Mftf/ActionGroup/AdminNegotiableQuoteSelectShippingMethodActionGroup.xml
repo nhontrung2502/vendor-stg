@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminNegotiableQuoteSelectShippingMethodActionGroup">
+        <annotations>
+            <description>You are on the Admin Negotiable Quote view page, select shipping method</description>
+        </annotations>
+        <arguments>
+            <argument name="shippingMethod" type="string" defaultValue="Flat Rate"/>
+        </arguments>
+        <click selector="{{AdminNegotiableQuoteViewSection.getShippingMethodsAndRates}}" stepKey="clickGetShippingMethodsAndRates"/>
+        <waitForElementVisible selector="{{AdminNegotiableQuoteViewSection.shippingMethod(shippingMethod)}}" stepKey="waitForShippingMethodVisible"/>
+        <click selector="{{AdminNegotiableQuoteViewSection.shippingMethod(shippingMethod)}}" stepKey="chooseShippingMethod"/>
+    </actionGroup>
+</actionGroups>

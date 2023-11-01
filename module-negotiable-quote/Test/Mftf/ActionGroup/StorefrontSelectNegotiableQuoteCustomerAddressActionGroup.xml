@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+* Copyright © Magento, Inc. All rights reserved.
+* See COPYING.txt for license details.
+*/
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontSelectNegotiableQuoteCustomerAddressActionGroup">
+        <annotations>
+            <description>Select existing customer address to use it in negotiable quote.</description>
+        </annotations>
+        <arguments>
+            <argument name="addressData" defaultValue="{{US_Address_CA.state}}" type="string"/>
+        </arguments>
+
+        <click selector="{{StorefrontNegotiableQuoteViewSection.selectExistingAddressButton}}" stepKey="clickSelectExistingAddressButton"/>
+        <waitForElementVisible selector="{{StorefrontNegotiableQuoteChangeAddressSection.selectQuoteAddress}}" stepKey="waitForAddressesPopup"/>
+        <selectOption selector="{{StorefrontNegotiableQuoteChangeAddressSection.selectQuoteAddress}}" userInput="{{addressData}}" stepKey="selectShippingAddress"/>
+        <click selector="{{StorefrontNegotiableQuoteChangeAddressSection.saveAddressButton}}" stepKey="clickSaveAddressButton"/>
+        <waitForElementVisible selector="{{StorefrontMessagesSection.noticeMessage}}" stepKey="waitForMessage"/>
+        <see selector="{{StorefrontMessagesSection.noticeMessage}}" userInput="{{StorefrontNegotiableQuoteMessageData.shippingAddressChangeMessage}}" stepKey="seeNoticeMessage"/>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,19 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject New quote {{var data.quote_name}} :: {{var data.customer_company}} @-->
+<!--@vars {
+"var data.quote_name":"Quote Name",
+"var data.customer_company":"Company Name",
+"var merchant_name":"Merchant Name",
+"var quote_url":"Quote URL",
+"var store.frontend_name": "Store Frontend Name"
+} @-->
+
+<p class="greeting">{{trans "Dear %merchant_name," merchant_name=$merchant_name}}</p>
+<p>{{trans "New quote "}}<a href="{{var quote_url}}">{{var data.quote_name}}</a>{{trans " submitted by buyer"}}
+    <b>{{var data.customer_company}}</b>.</p>
+<br /><p>{{trans "Thank you,"}}</p><p>{{trans "%store_name" store_name=$store.frontend_name |raw}}</p>

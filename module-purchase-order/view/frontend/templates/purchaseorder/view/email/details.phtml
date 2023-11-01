@@ -1,0 +1,19 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+<tr class="email-summary">
+    <td>
+        <?= $block->getChildHtml('purchase.order.email.title') ?>
+    </td>
+</tr>
+<tr class="email-information">
+    <td>
+        <?= $block->getChildHtml('purchase.order.email.shipping') ?>
+        <?= $block->getChildHtml('purchase.order.email.items') ?>
+    </td>
+</tr>

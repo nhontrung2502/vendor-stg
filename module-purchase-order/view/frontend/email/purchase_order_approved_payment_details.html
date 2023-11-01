@@ -1,0 +1,54 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!--@subject {{trans "Purchase Order #%increment_id has been Approved" increment_id=$data.purchase_order_increment_id}} @-->
+<!--@vars {
+"var data.purchase_order_increment_id":"Purchase Order Increment Id",
+"var data.purchase_order_id":"Purchase Order Id",
+"var data.approver_full_name":"Approver Full Name",
+"var data.buyer_full_name":"Buyer Full Name",
+"var store":"Store",
+"var this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])":"Url"
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="button" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans "%buyer_full_name" buyer_full_name=$data.buyer_full_name}},</p>
+            <p>
+                {{trans 'Your Purchase Order <a href="%po_url">#%po_id</a> has been approved by %approver_full_name.'
+                    po_url=$this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])
+                    po_id=$data.purchase_order_increment_id
+                    approver_full_name=$data.approver_full_name
+                |raw}}
+                {{trans "Go to the Add Payment page to complete the order."}}
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table class="inner-wrapper" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td align="center">
+                        {{trans "<a href="%purchase_order_add_payment_url">Add Payment</a>"
+                        purchase_order_add_payment_url=$this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])
+                        |raw}}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p>
+                {{trans "Your Purchase Order details are below."}}
+            </p>
+        </td>
+    </tr>
+    {{layout handle="email_purchaseorder_details" area="frontend" purchaseOrderId=$data.purchase_order_id}}
+</table>
+{{template config_path="design/email/footer_template"}}

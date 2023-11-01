@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontPurchaseOrderOnlinePaymentAddressValidationErrorMessageTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Verify Online Payment Method Purchase Order Error Messages When Required Address Attribute Is Not Set"/>
+            <description value="Verify Online Payment Method Purchase Order Error Messages When Required Address Attribute Is Not Set"/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-39983"/>
+            <testCaseId value="MC-40862"/>
+            <group value="purchase_orders"/>
+        </annotations>
+
+        <before>
+            <!-- Enable PayPal, Create Company Admin, 1 Customer, & 1 Product -->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminPayPalExpressCheckoutEnableActionGroup" stepKey="configPaypalExpressCheckout" />
+            <createData entity="CompanyAdminUser" stepKey="createCompanyAdmin"/>
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="SimpleSubCategory" stepKey="category"/>
+            <createData entity="SimpleProductForPurchaseOrder_Price_987_65" stepKey="product">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createCompany.id$"/>
+                <argument name="companyName" value="$createCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrderForCompany"/>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="SaveCompany"/>
+            <!-- Create new customer address required attribute -->
+            <amOnPage url="{{CustomerAddressAttributesPage.url}}" stepKey="navigateToCustomerAddressAttributesPage"/>
+            <waitForPageLoad stepKey="waitForCustomerAddressAttributePageLoad"/>
+            <actionGroup ref="AdminCreateCustomerNewAttributeWithRequiredValues" stepKey="createTextFieldAttribute">
+                <argument name="defaultLabel" value="{{AttributeTextField.frontend_label}}"/>
+                <argument name="attributeCode" value="{{AttributeTextField.attribute_code}}"/>
+                <argument name="inputType" value="{{AttributeTextField.frontend_input}}"/>
+                <argument name="sortOrder" value="10"/>
+            </actionGroup>
+            <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+                <argument name="Customer" value="$createCompanyAdmin$"/>
+            </actionGroup>
+        </before>
+
+        <after>
+            <!-- Revert Configurations & Delete Data -->
+            <actionGroup ref="AdminPayPalExpressCheckoutDisableActionGroup" stepKey="configPaypalExpressCheckoutDisable" />
+            <actionGroup ref="AdminDeleteCustomerAttribute" stepKey="deleteCustomerAttribute">
+                <argument name="defaultLabel" value="{{AttributeTextField.frontend_label}}"/>
+            </actionGroup>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="adminLogout"/>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="storefrontLogout"/>
+            <deleteData createDataKey="createCompany" stepKey="deleteCompany"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteAdminCustomer"/>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <deleteData createDataKey="product" stepKey="deleteProduct"/>
+        </after>
+
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProductPage">
+            <argument name="product" value="$product$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProductToCart">
+            <argument name="product" value="$product$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep"/>
+        <actionGroup ref="StorefrontPurchaseOrderCheckoutSelectPayPalExpressActionGroup" stepKey="selectPayPalExpress" />
+        <click selector="{{StorefrontCheckoutPurchaseOrderPaymentMethodSection.placePurchaseOrderButton}}" stepKey="clickPlaceOrder"/>
+        <waitForAjaxLoad stepKey="waitOrderRequestProcessed"/>
+        <seeElementInDOM  selector="{{StorefrontPurchaseOrderViewSection.paypalExpressExceptionMessage(' is a required value')}}" stepKey="waitForValidationExceptionMessage"/>
+    </test>
+</tests>

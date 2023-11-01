@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<logging xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Logging:etc/logging.xsd">
+    <groups>
+        <group name="negotiablequote">
+            <label translate="true">Negotiable Quotes</label>
+            <expected_models>
+                <expected_model class="Magento\Quote\Model\Quote"/>
+                <expected_model class="Magento\NegotiableQuote\Model\NegotiableQuote"/>
+                <expected_model class="Magento\NegotiableQuote\Model\NegotiableQuoteTotals"/>
+            </expected_models>
+            <events>
+                <event controller_action="quotes_quote_save"
+                       action_alias="save"/>
+                <event controller_action="quotes_quote_send"
+                       action_alias="save"/>
+                <event controller_action="quotes_quote_decline"
+                       action_alias="save"/>
+                <event controller_action="quotes_quote_massDeclineCheck"
+                       action_alias="massUpdate"/>
+            </events>
+        </group>
+    </groups>
+</logging>

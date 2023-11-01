@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontValidateNoApproveRejectButtonsAndCheckboxesInGridActionGroup">
+        <annotations>
+            <description>Validates that the Approve, Reject buttons and checkboxes do not appear in the grid on the Purchase Order listing page on the storefront.</description>
+        </annotations>
+        <arguments>
+            <argument name="tabName" defaultValue="" type="string"/>
+        </arguments>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderApproveSelectedButton(tabName)}}" stepKey="verifyApproveNotAvailable"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRejectSelectedButton(tabName)}}" stepKey="verifyRejectNotAvailable"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderGridSection.selectAllDropdown(tabName)}}" stepKey="verifySelectAllDropdownNotAvailable"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderGridSection.singleCheckbox(tabName)}}" stepKey="verifySingleCheckboxNotAvailable"/>
+    </actionGroup>
+</actionGroups>

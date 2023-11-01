@@ -1,0 +1,45 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\PurchaseOrder\Block\PurchaseOrder\Info\Banner $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$paymentDetailsAnchor = sprintf(
+    '<a href="%s">%s</strong></a>',
+    $block->getUrl(
+        'checkout/index/index',
+        ['purchaseOrderId' => $block->getPurchaseOrder()->getEntityId()]
+    ),
+    $escaper->escapeHtml(__('Place Order'))
+);
+$paymentDetailsHtml = __('To proceed with this order, go to %1 page.', $paymentDetailsAnchor);
+
+?>
+<?php if ($block->canOrder()): ?>
+<div class="message info empty">
+    <span>
+        <?= $escaper->escapeHtml($paymentDetailsHtml, ['a', 'strong']) ?>
+    </span>
+</div>
+<?php elseif ($block->canView()): ?>
+    <?php if ($block->hasError()): ?>
+        <div class="message error">
+        <span>
+            <?= $escaper->escapeHtml(
+                __('This order could not be completed as some items are currently unavailable.')
+            ) ?>
+        </span>
+        </div>
+    <?php else: ?>
+        <div class="message info empty">
+            <span>
+                <?= $escaper->escapeHtml(
+                    __('This purchase order has been approved but the payment details must be updated.')
+                ) ?>
+            </span>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>

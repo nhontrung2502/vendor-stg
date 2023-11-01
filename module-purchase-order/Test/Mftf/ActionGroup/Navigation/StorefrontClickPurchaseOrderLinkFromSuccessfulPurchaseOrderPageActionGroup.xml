@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup">
+        <annotations>
+            <description>Clicks the purchase order number link from the successful purchase order submittal page</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderLink}}" stepKey="waitForPurchaseOrderLink"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderNumber"/>
+        <click selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderLink}}" stepKey="clickPurchaseOrderLink"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <waitForElementVisible selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" stepKey="waitForPageTitle"/>
+        <see userInput="Purchase Order # {$purchaseOrderNumber}" selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" stepKey="seePageTitle"/>
+    </actionGroup>
+</actionGroups>

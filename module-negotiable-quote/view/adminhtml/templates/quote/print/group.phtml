@@ -1,0 +1,11 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /** @var $block \Magento\NegotiableQuote\Block\Adminhtml\Quote\View\CustomerGroup */ ?>
+<div class="quote-information-row">
+    <strong><?= $block->escapeHtml(__('Customer Group')) ?>: </strong>
+    <span><?= $block->escapeHtml($block->getGroupName()) ?></span>
+</div>

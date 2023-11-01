@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontBulkRejectPurchaseOrdersActionGroup"
+                 extends="StorefrontBulkApprovePurchaseOrdersActionGroup">
+        <annotations>
+            <description>Rejects all selected purchase orders on the storefront and verifies status change. Must be on the Requires My Approval tab</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRejectSelectedButton(tabName)}}" stepKey="waitForApproveButton"/>
+        <click selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRejectSelectedButton(tabName)}}" stepKey="clickApprovalButton"/>
+        <waitForText selector="{{StorefrontPurchaseOrderBulkActionsModalSection.modalContent}}" userInput="This action cannot be undone. Are you sure you want to reject the selected purchase orders?" stepKey="waitForConfirm"/>
+    </actionGroup>
+</actionGroups>

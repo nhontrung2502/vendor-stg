@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontVerifyCommentMessageActionGroup">
+        <annotations>
+            <description>Validate the Comment tab for a specific message and its date.</description>
+        </annotations>
+        <arguments>
+            <argument name="index" type="string" defaultValue="1"/>
+            <argument name="commentMessage" type="string" defaultValue=""/>
+            <argument name="date" type="string" defaultValue=""/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderCommentsSection.content}}" stepKey="waitForCommentContent"/>
+        <waitForText selector="{{StorefrontPurchaseOrderCommentsSection.commentMessage(index)}}" userInput="{{commentMessage}}" stepKey="waitForTextCommentMessage"/>
+        <waitForText selector="{{StorefrontPurchaseOrderCommentsSection.commentDate(index)}}" userInput="{{date}}" stepKey="waitForTextCommentMessageDate"/>
+    </actionGroup>
+</actionGroups>

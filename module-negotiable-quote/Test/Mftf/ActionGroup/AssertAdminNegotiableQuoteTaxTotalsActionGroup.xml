@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AssertAdminNegotiableQuoteTaxTotalsActionGroup">
+        <annotations>
+            <description>Validates that the provided catalog subtotal including tax, tax totals are present and correct in admin.</description>
+        </annotations>
+        <arguments>
+            <argument name="catalogSubtotalInclTax" defaultValue="108.25" type="string"/>
+            <argument name="catalogTax" defaultValue="8.25" type="string"/>
+            <argument name="totalTax" defaultValue="8.25" type="string"/>
+        </arguments>
+
+        <see selector="{{AdminNegotiableQuoteTotalsSection.quoteCatalogSubtotalInclTax}}" userInput="{{catalogSubtotalInclTax}}" stepKey="assertCatalogSubtotalIncludingTax"/>
+        <see selector="{{AdminNegotiableQuoteTotalsSection.catalogTax}}" userInput="{{catalogTax}}" stepKey="assertCatalogTax"/>
+        <see selector="{{AdminNegotiableQuoteTotalsSection.totalTax}}" userInput="{{totalTax}}" stepKey="assertTotalTax"/>
+    </actionGroup>
+</actionGroups>

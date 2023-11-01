@@ -1,0 +1,11 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/* @var $block \Magento\NegotiableQuote\Block\Order\CreatedBy */
+?>
+
+<td data-th="<?= $block->escapeHtmlAttr(__('Created By')) ?>" class="col shipping">
+    <?= $block->escapeHtml($block->getCreatedBy()) ?></td>

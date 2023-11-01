@@ -1,0 +1,113 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd" extends="my_purchaseorder_listing">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">company_purchaseorder_listing.company_purchaseorder_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>company_purchaseorder_listing.company_purchaseorder_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="purchaseorder_listing_data_source">
+        <dataProvider class="Magento\PurchaseOrder\Ui\Component\DataProvider"
+                      name="company_purchaseorder_listing_data_source">
+            <settings>
+                <primaryFieldName>main_table.entity_id</primaryFieldName>
+                <requestFieldName>id</requestFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <container name="listing_actions" sortOrder="10">
+        <massaction name="listing_massaction"
+                    component="Magento_B2b/js/grid/massactions"
+                    template="Magento_B2b/grid/actionButtons">
+            <action name="reject">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="cssClass" xsi:type="string">secondary reject</item>
+                    </item>
+                </argument>
+                <settings>
+                    <confirm>
+                        <message translate="true">This action cannot be undone. Are you sure you want to reject the selected purchase orders?</message>
+                    </confirm>
+                    <url path="purchaseorder/purchaseorder/reject"/>
+                    <type>reject</type>
+                    <label translate="true">Reject Selected</label>
+                    <imports>
+                        <link name="actionSelections">${ $.provider }.purchaseorder_listing_columns:actionSelections</link>
+                    </imports>
+                </settings>
+            </action>
+            <action name="approve">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="cssClass" xsi:type="string">primary approve</item>
+                    </item>
+                </argument>
+                <settings>
+                    <confirm>
+                        <message translate="true">This action cannot be undone. Are you sure you want to approve the selected purchase orders?</message>
+                    </confirm>
+                    <url path="purchaseorder/purchaseorder/approve"/>
+                    <type>approve</type>
+                    <label translate="true">Approve Selected</label>
+                    <imports>
+                        <link name="actionSelections">${ $.provider }.purchaseorder_listing_columns:actionSelections</link>
+                    </imports>
+                </settings>
+            </action>
+        </massaction>
+    </container>
+    <columns name="purchaseorder_listing_columns" component="uiB2bListing" sortOrder="20">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="table_css_class" xsi:type="string">data table bulk-approval</item>
+                <item name="selectableStatuses" xsi:type="array">
+                    <item name="pending" xsi:type="string">pending</item>
+                    <item name="approval_required" xsi:type="string">approval_required</item>
+                </item>
+            </item>
+        </argument>
+        <settings>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">company_purchaseorder_listing.company_purchaseorder_listing.purchaseorder_columns_editor</item>
+                </param>
+            </childDefaults>
+        </settings>
+        <selectionsColumn name="ids" component="Magento_B2b/js/grid/columns/multiselect" sortOrder="1">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="selectableStatuses" xsi:type="array">
+                        <item name="pending" xsi:type="string">pending</item>
+                        <item name="approval_required" xsi:type="string">approval_required</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </selectionsColumn>
+    </columns>
+    <container name="listing_top" sortOrder="30">
+        <paging name="listing_paging" component="uiB2bPaging">
+            <settings>
+                <selectProvider>company_purchaseorder_listing.company_purchaseorder_listing.purchaseorder_listing_columns.ids</selectProvider>
+                <storageConfig>
+                    <provider>company_purchaseorder_listing.company_purchaseorder_listing.listing_top.bookmarks</provider>
+                </storageConfig>
+            </settings>
+        </paging>
+    </container>
+</listing>

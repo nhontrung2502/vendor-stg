@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <sales_email>
+            <purchase_order_notification>
+                <enabled>1</enabled>
+                <purchase_order_approval_request>sales_email_purchase_order_notification_purchase_order_approval_request</purchase_order_approval_request>
+                <purchase_order_approval_required>sales_email_purchase_order_notification_purchase_order_approval_required</purchase_order_approval_required>
+                <purchase_order_approval_required_payment_details>sales_email_purchase_order_notification_purchase_order_approval_required_payment_details</purchase_order_approval_required_payment_details>
+                <purchase_order_auto_approved>sales_email_purchase_order_notification_purchase_order_auto_approved</purchase_order_auto_approved>
+                <purchase_order_auto_approved_payment_details>sales_email_purchase_order_notification_purchase_order_auto_approved_payment_details</purchase_order_auto_approved_payment_details>
+                <purchase_order_approved>sales_email_purchase_order_notification_purchase_order_approved</purchase_order_approved>
+                <purchase_order_approved_payment_details>sales_email_purchase_order_notification_purchase_order_approved_payment_details</purchase_order_approved_payment_details>
+                <purchase_order_rejected>sales_email_purchase_order_notification_purchase_order_rejected</purchase_order_rejected>
+                <purchase_order_comment_added>sales_email_purchase_order_notification_purchase_order_comment_added</purchase_order_comment_added>
+                <purchase_order_order_place_failed>sales_email_purchase_order_notification_purchase_order_order_place_failed</purchase_order_order_place_failed>
+            </purchase_order_notification>
+        </sales_email>
+    </default>
+</config>

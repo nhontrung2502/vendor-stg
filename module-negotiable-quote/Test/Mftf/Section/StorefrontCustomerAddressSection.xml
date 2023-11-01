@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontCustomerAddressSection">
+        <element name="changeBillingAddressLink" type="text" selector="//div[@class='block block-addresses-default']//div[@class='box box-address-billing']//span[text()='Change Billing Address']"/>
+        <element name="dropdownField" type="select" selector="select[name*='{{arg1}}']" parameterized="true"/>
+        <element name="saveAddress" type="button" selector="//button[@data-action='save-address']//span[text()='Save Address']"/>
+        <element name="changeShippingAddressLink" type="text" selector="//div[@class='block block-addresses-default']//div[@class='box box-address-shipping']//span[text()='Change Shipping Address']"/>
+        <element name="seeCustomAttribute" type="textarea" selector=".shipping-address-item.selected-item"/>
+    </section>
+</sections>

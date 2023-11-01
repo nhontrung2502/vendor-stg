@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="purchase_order" resource="default" engine="innodb" comment="purchase_order">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="varchar" name="increment_id" nullable="true" length="50"
+                comment="Purchase Order Increment Id"/>
+        <column xsi:type="int" name="quote_id" unsigned="true" nullable="false" identity="false"
+                comment="Quote ID"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="255" comment="Purchase Order Request status"/>
+        <column xsi:type="int" name="creator_id" unsigned="true" nullable="true" identity="false"
+                comment="Purchase Order Request creator id"/>
+        <column xsi:type="int" name="company_id" unsigned="true" nullable="false" identity="false"
+                comment="Company ID"/>
+        <column xsi:type="int" name="address_id" unsigned="true" nullable="false" identity="false"
+                comment="Address ID"/>
+        <column xsi:type="varchar" name="shipping_method" nullable="true" length="40" comment="Shipping Method"/>
+        <column xsi:type="varchar" name="payment_method" nullable="true" length="255" comment="Payment Method"/>
+        <column xsi:type="decimal" name="grand_total" scale="4" precision="12" unsigned="false" nullable="false"
+                comment="PO Grand Total"/>
+        <column xsi:type="mediumtext" name="snapshot" nullable="true" comment="Associated Quote Snapshot"/>
+        <column xsi:type="smallint" name="is_validate" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Is Validate"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Order Reference ID"/>
+        <column xsi:type="varchar" name="order_increment_id" nullable="true" length="50" comment="Order Reference Increment ID"/>
+        <column xsi:type="boolean" name="auto_approved" nullable="true" default="false" comment="Was the order auto approved?"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="PURCHASE_ORDER_QUOTE_ID">
+            <column name="quote_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="PURCHASE_ORDER_COMPANY_ID_COMPANY_ENTITY_ID" table="purchase_order"
+                    column="company_id" referenceTable="company" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="PURCHASE_ORDER_CREATOR_ID_CUSTOMER_ENTITY_ENTITY_ID"
+                    table="purchase_order" column="creator_id" referenceTable="customer_entity"
+                    referenceColumn="entity_id" onDelete="SET NULL"/>
+        <index referenceId="PURCHASE_ORDER_CREATOR_ID" indexType="btree">
+            <column name="creator_id"/>
+        </index>
+    </table>
+    <table name="purchase_order_approved_by" resource="default" engine="innodb" comment="Record which customers have approved the PO">
+        <column xsi:type="int" name="purchase_order_id" unsigned="true" nullable="false"
+                comment="Purchase Order ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false"
+                comment="Approving Customer ID"/>
+        <constraint xsi:type="foreign" referenceId="PURCHASE_ORDER_APPROVED_BY_PURCHASE_ORDER"
+                    table="purchase_order_approved_by" column="purchase_order_id" referenceTable="purchase_order"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="PURCHASE_ORDER_RULE_APPROVER_ROLE_ID"
+                    table="purchase_order_approved_by" column="customer_id" referenceTable="customer_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="primary" referenceId="PURCHASE_ORDER_APPROVED_BY_UNIQUE">
+            <column name="purchase_order_id"/>
+            <column name="customer_id"/>
+        </constraint>
+    </table>
+    <table name="purchase_order_log" resource="default" engine="innodb" comment="purchase_order_log">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="int" name="request_id" unsigned="true" nullable="false" identity="false"
+                comment="Request Id"/>
+        <column xsi:type="text" name="request_log" nullable="false" comment="Request Log"/>
+        <column xsi:type="text" name="activity_type" nullable="false" comment="Activity Type"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Log Time"/>
+        <column xsi:type="int" name="owner_id" unsigned="true" nullable="true" identity="false"
+                comment="Owner ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="PURCHASE_ORDER_LOG_REQUEST_ID_PURCHASE_ORDER_ENTITY_ID"
+                    table="purchase_order_log" column="request_id" referenceTable="purchase_order"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="purchase_order_comment" resource="default" engine="innodb" comment="PO Request Comments Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="Entity Id"/>
+        <column xsi:type="int" name="purchase_order_id" unsigned="true" nullable="false" identity="false"
+                comment="Purchase Order Id"/>
+        <column xsi:type="int" name="creator_id" unsigned="true" nullable="false" identity="false"
+                comment="Comment author ID"/>
+        <column xsi:type="text" name="comment" nullable="false" comment="Comment"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="PURCHASE_ORDER_COMMENT_PURCHASE_ORDER_ID_PURCHASE_ORDER_ENTT_ID"
+                    table="purchase_order_comment" column="purchase_order_id" referenceTable="purchase_order"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="PURCHASE_ORDER_COMMENT_PURCHASE_ORDER_ID" indexType="btree">
+            <column name="purchase_order_id"/>
+        </index>
+        <index referenceId="PURCHASE_ORDER_COMMENT_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+    </table>
+    <table name="purchase_order_company_config" resource="default" engine="innodb"
+           comment="purchase_order_company_config">
+        <column xsi:type="int" name="company_entity_id" unsigned="true" nullable="false"
+                identity="false" comment="Company ID"/>
+        <column xsi:type="smallint" name="is_purchase_order_enabled" unsigned="true" nullable="false"
+                identity="false" default="0" comment="Is Purchase Order Enabled For This Company"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="company_entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="PURCHASE_ORDER_COMPANY_CONFIG_COMPANY_ENTT_ID_COMPANY_ENTT_ID"
+                    table="purchase_order_company_config" column="company_entity_id" referenceTable="company"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+</schema>

@@ -1,0 +1,34 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Totals\Giftcards $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$quote = $block->getQuote();
+$cards  = $block->getGiftCards();
+?>
+<?php if ($cards) : ?>
+    <?php foreach ($cards as $card) : ?>
+        <tr class="giftcard_total">
+            <th colspan="2" <?= $escaper->escapeHtml($block->getLabelProperties()) ?> scope="row">
+                <?= $escaper->escapeHtml(__('Gift Card (%1)', $card->getCode())) ?>
+            </th>
+            <td data-th="<?= $escaper->escapeHtml($card->getCode()) ?>">
+                <span class="discount">-<?= $escaper->escapeHtml($block->formatPrice($card->getAmount()), ['span']) ?></span>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+<?php elseif ($quote->getGiftCardsAmount() > 0) : ?>
+    <tr class="giftcard totals">
+        <th colspan="2" <?= $escaper->escapeHtml($block->getValueProperties()) ?>>
+            <?= $escaper->escapeHtml(__('Gift Card')) ?>
+        </th>
+        <td>
+            <span class="discount">-<?= $escaper->escapeHtml($block->formatPrice($quote->getGiftCardsAmount()), ['span']) ?></span>
+        </td>
+    </tr>
+<?php endif?>

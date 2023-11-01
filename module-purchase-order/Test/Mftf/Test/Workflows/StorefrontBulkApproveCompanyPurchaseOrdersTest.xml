@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontBulkApproveCompanyPurchaseOrdersTest" extends="StorefrontApproveSubordinatePurchaseOrderTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Bulk Approve Company Purchase Orders"/>
+            <description value="Verify that a company admin can bulk approve purchase orders"/>
+            <severity value="MAJOR"/>
+            <group value="purchase_orders"/>
+        </annotations>
+        <!-- Create Purchase Order #2 -->
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page2" after="purchaseOrder1IntId">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart2" after="gotToProduct1Page2"/>
+        <!-- Complete Checkout #2 -->
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage2" after="addProduct1ToCart2"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod2" after="navigateToCheckoutPage2"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep2" after="selectFirstShippingMethod2"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMoneyOrder2" after="clickNextOnShippingStep2"/>
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder2" after="selectCheckMoneyOrder2"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder2" after="clickPlacePurchaseOrder2"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderNumber2" after="validateSuccessfulPurchaseOrder2"/>
+        <!-- Verify Purchase Order Requires Approval #2 -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink2" after="purchaseOrderNumber2"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovalRequired2" after="clickPurchaseOrderLink2">
+            <argument name="status" value="{{PurchaseOrderStatuses.approvalRequired}}"/>
+        </actionGroup>
+        <grabFromCurrentUrl regex="~request_id\/(\d+)~" stepKey="purchaseOrder2IntId" after="validatePurchaseOrderApprovalRequired2"/>
+        <!-- Create Purchase Order #3 -->
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page3" after="purchaseOrder2IntId">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart3" after="gotToProduct1Page3"/>
+        <!-- Complete Checkout #3 -->
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage3" after="addProduct1ToCart3"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod3" after="navigateToCheckoutPage3"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep3" after="selectFirstShippingMethod3"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMoneyOrder3" after="clickNextOnShippingStep3"/>
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder3" after="selectCheckMoneyOrder3"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder3" after="clickPlacePurchaseOrder3"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderNumber3" after="validateSuccessfulPurchaseOrder3"/>
+        <!-- Verify Purchase Order Requires Approval #3 -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink3" after="purchaseOrderNumber3"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovalRequired3" after="clickPurchaseOrderLink3">
+            <argument name="status" value="{{PurchaseOrderStatuses.approvalRequired}}"/>
+        </actionGroup>
+        <grabFromCurrentUrl regex="~request_id\/(\d+)~" stepKey="purchaseOrder3IntId" after="validatePurchaseOrderApprovalRequired3"/>
+        <remove keyForRemoval="navigateToViewPurchaseOrderPage"/>
+        <remove keyForRemoval="writeCommentOnPurchaseOrder"/>
+        <remove keyForRemoval="approvePurchaseOrder"/>
+        <remove keyForRemoval="poApprovedTime"/>
+        <remove keyForRemoval="NavigateToHistoryLogTab"/>
+        <remove keyForRemoval="checkHistoryLog"/>
+        <remove keyForRemoval="navigationToCommentTab"/>
+        <remove keyForRemoval="checkComment"/>
+        <remove keyForRemoval="navigateToCompanyPurchaseOrdersPage"/>
+        <remove keyForRemoval="verifyPOStatusInGrid"/>
+        <remove keyForRemoval="navigateToApprovalPurchaseOrdersPage2"/>
+        <remove keyForRemoval="verifyPOStatusInGrid2"/>
+        <remove keyForRemoval="PurchaseOrderCheckboxIsDisabled"/>
+        <!-- Validate that bulk action buttons do not appear in the grid for non-admin user -->
+        <actionGroup ref="StorefrontValidateNoApproveRejectButtonsAndCheckboxesInGridActionGroup" stepKey="validateNoApproveRejectButtons">
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <!-- Login as Company Admin -->
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutApprover"/>
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin2">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+        <!-- Verify Bulk Approve Disabled When 0 Checked -->
+        <actionGroup ref="StorefrontNavigateToCompanyPurchaseOrdersPageActionGroup" stepKey="navigateToCompanyPurchaseOrdersPage3"/>
+        <actionGroup ref="StorefrontVerifyPOApproveSelectedButtonDisabledActionGroup" stepKey="verifyApprovalButtonDisabled">
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAssertPOSelectionCounterValueActionGroup" stepKey="verifySelectionCount">
+            <argument name="count" value="0"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <!-- Select All -->
+        <actionGroup ref="StorefrontSelectAllPOsInGridActionGroup" stepKey="selectAllPOs">
+            <argument name="count" value="3"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAssertPOSelectionCounterValueActionGroup" stepKey="verifySelectionCount2">
+            <argument name="count" value="3"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <!-- Cancel Bulk Approval -->
+        <actionGroup ref="StorefrontClickApproveSelectedPurchaseOrderFromPurchaseOrderGridActionGroup" stepKey="clickApprovePurchaseOrders">
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontClickCancelInBulkActionPurchaseOrderModalActionGroup" stepKey="clickCancelBulkAction"/>
+        <actionGroup ref="StorefrontAssertPOSelectionCounterValueActionGroup" stepKey="verifySelectionCount3">
+            <argument name="count" value="3"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO1Status">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderId"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approvalRequired}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO2Status">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderNumber2"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approvalRequired}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO3Status">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderNumber3"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approvalRequired}}"/>
+        </actionGroup>
+        <!-- Uncheck 1 PO -->
+        <actionGroup ref="StorefrontUncheckPurchaseOrderFromPurchaseOrderGridActionGroup" stepKey="uncheckPurchaseOrderFromSelection">
+            <argument name="purchaseOrderNumber" value='$purchaseOrder3IntId'/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAssertPOSelectionCounterValueActionGroup" stepKey="verifySelectionCount4">
+            <argument name="count" value="2"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <!-- Bulk Approve -->
+        <actionGroup ref="StorefrontBulkApprovePurchaseOrdersActionGroup" stepKey="bulkApprovePurchaseOrder">
+            <argument name="messageText" value="2 Purchase Orders have been successfully approved"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontPOValidateCurrentTabActionGroup" stepKey="validateOpenedPurchaseOrdersTab">
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO1Status2">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderId"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approved}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO2Status2">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderNumber2"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approved}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO3Status2">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderNumber3"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approvalRequired}}"/>
+        </actionGroup>
+        <!-- Verify Unchecked PO is Not Approved -->
+        <actionGroup ref="StorefrontCheckPurchaseOrderFromPurchaseOrderGridActionGroup" stepKey="checkPurchaseOrder">
+            <argument name="purchaseOrderNumber" value="$purchaseOrder3IntId"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAssertPOSelectionCounterValueActionGroup" stepKey="verifySelectionCount5">
+            <argument name="count" value="1"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <!-- Verify Approved POs are Disabled -->
+        <actionGroup ref="StorefrontVerifyPOSelectCheckboxDisabledActionGroup" stepKey="PurchaseOrder1CheckboxIsDisabled">
+            <argument name="id" value="$purchaseOrder1IntId"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontVerifyPOSelectCheckboxDisabledActionGroup" stepKey="PurchaseOrder2CheckboxIsDisabled">
+            <argument name="id" value="$purchaseOrder2IntId"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <!-- Bulk Approve -->
+        <actionGroup ref="StorefrontBulkApprovePurchaseOrdersActionGroup" stepKey="bulkApprovePurchaseOrder2">
+            <argument name="messageText" value="1 Purchase Order has been successfully approved"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontPOValidateCurrentTabActionGroup" stepKey="validateOpenedPurchaseOrdersTab2">
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <!-- Verify All POs Are Approved -->
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO1Status3">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderId"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approved}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO2Status3">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderNumber2"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approved}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPO3Status3">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderNumber3"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.approved}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontSelectAllPOsInGridActionGroup" stepKey="selectAllPOs2">
+            <argument name="count" value="0"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAssertPOSelectionCounterValueActionGroup" stepKey="verifySelectionCount6">
+            <argument name="count" value="0"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontVerifyPOApproveSelectedButtonDisabledActionGroup" stepKey="verifyApprovalButtonDisabled2">
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontVerifyPOSelectCheckboxDisabledActionGroup" stepKey="PurchaseOrder1CheckboxIsDisabled2">
+            <argument name="id" value="$purchaseOrder1IntId"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontVerifyPOSelectCheckboxDisabledActionGroup" stepKey="PurchaseOrder2CheckboxIsDisabled2">
+            <argument name="id" value="$purchaseOrder2IntId"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontVerifyPOSelectCheckboxDisabledActionGroup" stepKey="PurchaseOrder3CheckboxIsDisabled2">
+            <argument name="id" value="$purchaseOrder3IntId"/>
+            <argument name="tabName" value="company"/>
+        </actionGroup>
+    </test>
+</tests>

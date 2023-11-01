@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontNavigateToMyPurchaseOrdersPageActionGroup">
+        <annotations>
+            <description>Navigates to the user's My Purchase Orders page on the storefront using the UI. Must be within a user's Account Details on storefront.</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontCustomerSidebarSection.sidebarCurrentTab('My Purchase Orders')}}" stepKey="waitForMyPurchaseOrdersTab"/>
+        <click selector="{{StorefrontCustomerSidebarSection.sidebarCurrentTab('My Purchase Orders')}}" stepKey="clickMyPurchaseOrdersTab"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <waitForElementVisible selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" stepKey="waitForPageTitle"/>
+        <see selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" userInput="My Purchase Orders" stepKey="seePageTitle"/>
+        <click selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderGridTab('my')}}" stepKey="selectPurchaseOrdersTab" />
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderGrid('my')}}" stepKey="waitForGrid"/>
+    </actionGroup>
+</actionGroups>

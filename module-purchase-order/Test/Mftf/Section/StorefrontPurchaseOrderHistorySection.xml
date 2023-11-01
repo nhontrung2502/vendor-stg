@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontPurchaseOrderHistorySection">
+        <element name="content" type="text" timeout="10" selector="//*[@id='history-log']//div[contains(@class, 'purchase-order-comments-block')]"/>
+        <element name="logEntry" type="text" timeout="10" selector="//*[@id='history-log']//div[@class='comments-block-item']"/>
+        <element name="logMessage" type="text" timeout="10" parameterized="true" selector="//*[@id='history-log']//div[contains(@class, 'comments-block-item')][{{messageIndex}}]//div[contains(@class, 'comments-block-item-comment')]"/>
+        <element name="logDate" type="text" timeout="10" parameterized="true" selector="//*[@id='history-log']//div[contains(@class, 'comments-block-item')][{{messageIndex}}]//span[contains(@class, 'comments-block-item-date-time')]"/>
+        <element name="purchaseOrderHistoryTab" type="text" selector="#tab-label-history-log" timeout="30"/>
+        <element name="purchaseOrderHistoryLogGrid" type="text" selector="#history-log" timeout="30"/>
+        <element name="purchaseOrderHistoryLogItem" type="text" selector="//div[@id='history-log']//*[@class='comments-block-item-comment']" timeout="30"/>
+    </section>
+</sections>

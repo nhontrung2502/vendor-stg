@@ -1,0 +1,15 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<?php
+/** @var \Magento\Sales\Block\Adminhtml\Order\Create\Items\Grid $block */
+
+$item = $block->getItem();
+?>
+<div class="price-excl-tax">
+<?= /* @noEscape */ $block->formatPrice($item->getCalculationPrice()) ?>
+</div>

@@ -1,0 +1,69 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Info\Shipping $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<?php $quote = $block->getQuote() ?>
+<div class="block block-order-details-view quote-shipping-info">
+    <div class="block-title">
+        <strong><?= $escaper->escapeHtml(__('Shipping and Payment Information')) ?></strong>
+    </div>
+    <div class="block-content">
+        <div class="box box-order-billing-address">
+            <div class="box-content">
+                <div class="box box-shipping-address">
+                    <strong class="box-title">
+                        <span><?= $escaper->escapeHtml(__('Shipping Address')) ?></span>
+                    </strong>
+                    <div class="box-content" id="quote-address">
+                        <address><?= $block->getShippingAddressHtml() ?></address>
+                    </div>
+                </div>
+                <div class="box box-order-shipping-method">
+                    <strong class="box-title">
+                        <span><?= $escaper->escapeHtml(__('Shipping Method')) ?></span>
+                    </strong>
+                    <div class="box-content">
+                        <?php if ($quote->getShippingAddress()->getShippingDescription()): ?>
+                            <?= $escaper->escapeHtml($quote->getShippingAddress()->getShippingDescription()) ?>
+                        <?php else: ?>
+                            <?= $escaper->escapeHtml(__('No shipping information available')) ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="block-content">
+        <div class="box box box-order-billing-address">
+            <div class="box-content">
+                <div class="box box-payment-informations">
+                    <strong class="box-title">
+                        <span><?= $escaper->escapeHtml(__('Billing Address')) ?></span>
+                    </strong>
+                    <div class="box-content" id="quote-address">
+                        <address><?= $block->getBillingAddressHtml() ?></address>
+                    </div>
+                </div>
+                <div class="box box box-order-billing-method">
+                    <strong class="box-title">
+                        <span><?= $escaper->escapeHtml(__('Payment Method')) ?></span>
+                    </strong>
+                    <div class="box-content">
+                        <?php if ($method = $quote->getPayment()->getMethodInstance()): ?>
+                            <?= $escaper->escapeHtml($method->getTitle()) ?>
+                        <?php else: ?>
+                            <?= $escaper->escapeHtml(__('No payment information available')) ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

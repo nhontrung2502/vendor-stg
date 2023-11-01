@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontAssertPOSelectionCounterValueActionGroup">
+        <annotations>
+            <description>Verifies the number of selected purchase orders.</description>
+        </annotations>
+        <arguments>
+            <argument name="count" defaultValue="0" type="string"/>
+            <argument name="tabName" defaultValue="" type="string"/>
+        </arguments>
+        <waitForText userInput="Selected {{count}}" selector="{{StorefrontPurchaseOrderGridSection.selectedCount(tabName)}}" time="30" stepKey="assertSelectionCounter"/>
+    </actionGroup>
+</actionGroups>
