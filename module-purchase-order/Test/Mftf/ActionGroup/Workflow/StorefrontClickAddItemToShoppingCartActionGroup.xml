@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontClickAddItemToShoppingCartActionGroup">
+        <annotations>
+            <description>Clicks on Add Item to Shopping Cart from a Purchase Order details page on the storefront</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.addItemToShoppingCart}}" stepKey="waitForAddItemToShoppingCartVisible"/>
+        <seeElement selector="{{StorefrontPurchaseOrderViewSection.addItemToShoppingCart}}" stepKey="seeAddItemsToShoppingCart"/>
+        <click selector="{{StorefrontPurchaseOrderViewSection.addItemToShoppingCart}}" stepKey="clickAddItemsToShoppingCart"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+    </actionGroup>
+</actionGroups>

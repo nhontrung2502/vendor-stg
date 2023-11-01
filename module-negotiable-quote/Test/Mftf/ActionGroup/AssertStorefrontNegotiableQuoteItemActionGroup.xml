@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AssertStorefrontNegotiableQuoteItemActionGroup">
+        <annotations>
+            <description>Validates that the provided Product details (Name and Price), Product Quantity are present and correct in the Negotiable Quote on storefront.</description>
+        </annotations>
+        <arguments>
+            <argument name="productName" defaultValue="{{_defaultProduct.name}}" type="string"/>
+            <argument name="productPrice" defaultValue="{{_defaultProduct.price}}" type="string"/>
+            <argument name="subtotal" defaultValue="{{_defaultProduct.price}}" type="string"/>
+            <argument name="qty" defaultValue="1" type="string"/>
+        </arguments>
+
+        <seeElement selector="{{StorefrontNegotiableQuoteViewSection.productLinkByName(productName)}}" stepKey="seeProductNameInNegotiableQuoteItemsGrid"/>
+        <see selector="{{StorefrontNegotiableQuoteViewSection.productPriceByName(productName)}}" userInput="{{productPrice}}" stepKey="seeProductPriceInNegotiableQuoteItemsGrid"/>
+        <seeInField selector="{{StorefrontNegotiableQuoteViewSection.productQtyByName(productName)}}" userInput="{{qty}}" stepKey="seeProductQtyInNegotiableQuoteItemsGrid"/>
+        <see selector="{{StorefrontNegotiableQuoteViewSection.productSubtotalByName(productName)}}" userInput="{{subtotal}}" stepKey="seeProductSubtotalInNegotiableQuoteItemsGrid"/>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,23 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject Quote expires soon {{var data.quote_name}}@-->
+<!--@vars {
+"var data.customer_name":"Customer Name",
+"var data.quote_name":"Quote Name",
+"var data.expiration_period":"Expiration Period",
+"var frontend_quote_url":"Quote URL"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<p class="greeting">{{trans "Dear %customer_name," customer_name=$data.customer_name}}</p>
+<p>{{trans "Your quote "}}<a href="{{var frontend_quote_url}}">{{var data.quote_name}}</a>
+    {{trans " expires on "}}<b>{{var data.expiration_period}}</b>,
+    {{trans " after which time you can’t order the items in the quote. After the expiration,
+    you’ll have to negotiate the price with the seller again."}}</p>
+
+{{template config_path="design/email/footer_template"}}

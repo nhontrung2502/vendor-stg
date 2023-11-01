@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="PurchaseOrderStatuses">
+        <data key="approvalRequired">Approval Required</data>
+        <data key="approved">Approved</data>
+        <data key="approvedPendingPayment">Approved - Pending Payment</data>
+        <data key="canceled">Canceled</data>
+        <data key="ordered">Approved - Ordered</data>
+        <data key="pending">Pending</data>
+        <data key="rejected">Rejected</data>
+    </entity>
+</entities>

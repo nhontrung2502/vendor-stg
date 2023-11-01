@@ -1,0 +1,24 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject Declined quote {{var data.quote_name}} @-->
+<!--@vars {
+"var data.customer_name":"Customer Name",
+"var data.quote_name":"Quote Name",
+"var data.customer_company":"Company Name",
+"var merchant_name":"Merchant Name",
+"var frontend_quote_url":"Quote URL",
+"var reason":"Decline Reason"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<p class="greeting">{{trans "Dear %customer_name," customer_name=$data.customer_name}}</p>
+<p>{{trans "Your quote "}}<a href="{{var frontend_quote_url}}">{{var data.quote_name}}</a>
+    {{trans " has been declined by the seller."}}</p>
+<p>{{trans "Reason: %reason." reason=$reason}}</p>
+
+{{template config_path="design/email/footer_template"}}

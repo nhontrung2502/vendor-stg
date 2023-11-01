@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="NegotiableQuoteSystemConfig" type="b2b_config_state">
+        <requiredEntity type="company_active">companyActive</requiredEntity>
+        <requiredEntity type="negotiablequote_active">negotiableQuoteActive</requiredEntity>
+    </entity>
+
+    <entity name="companyActive" type="company_active">
+        <data key="value">1</data>
+    </entity>
+    <entity name="negotiableQuoteActive" type="negotiablequote_active">
+        <data key="value">1</data>
+    </entity>
+    <entity name="NeqotiableQuote" type="NegotiableQuote">
+        <data key="name" unique="suffix">QuoteName</data>
+        <data key="message" unique="suffix">QuoteMessage</data>
+    </entity>
+    <entity name="NeqotiableQuote" type="NegotiableQuote">
+        <data key="name" unique="suffix">QuoteName</data>
+        <data key="message" unique="suffix">QuoteMessage</data>
+    </entity>
+    <entity name="NeqotiableQuoteTwo" type="NegotiableQuote">
+        <data key="name" unique="suffix">QuoteTwo</data>
+        <data key="message" unique="suffix">QuoteMessage</data>
+    </entity>
+    <entity name="NeqotiableQuoteThree" type="NegotiableQuote">
+        <data key="name" unique="suffix">QuoteThree</data>
+        <data key="message" unique="suffix">QuoteMessage</data>
+    </entity>
+    <entity name="NeqotiableQuoteFour" type="NegotiableQuote">
+        <data key="name" unique="suffix">QuoteFour</data>
+        <data key="message" unique="suffix">QuoteMessage</data>
+    </entity>
+    <entity name="DefaultNegotiableQuote" type="NegotiableQuote">
+        <data key="name" unique="suffix">Name</data>
+        <data key="message" unique="suffix">Message</data>
+    </entity>
+    <entity name="NegotiableQuoteMessages">
+        <data key="quoteLockedMessage">This quote is currently locked for editing. It will become available once released by the buyer.</data>
+        <data key="shippingAddressLockedMessage">Your shipping address is locked. To change your shipping address, go back to the quote .</data>
+        <data key="addedOrChangedTheShippingAddressMessage">You have added or changed the shipping address on this quote. Please re-submit the quote to Seller.</data>
+        <data key="quoteToTheMerchantMessage">The quote has been sent to the merchant.</data>
+    </entity>
+    <entity name="EnableNegotiableQuoteConfigurationData">
+        <data key="path">btob/website_configuration/negotiablequote_active</data>
+        <data key="scope_id">0</data>
+        <data key="label">Yes</data>
+        <data key="value">1</data>
+    </entity>
+    <entity name="DisableNegotiableQuoteConfigurationData">
+        <data key="path">btob/website_configuration/negotiablequote_active</data>
+        <data key="scope_id">0</data>
+        <data key="label">No</data>
+        <data key="value">0</data>
+    </entity>
+</entities>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="SimpleProductForPurchaseOrder_Price_987_65" type="product">
+        <data key="sku" unique="suffix">simple-product-po-price-987-65-</data>
+        <data key="type_id">simple</data>
+        <data key="attribute_set_id">4</data>
+        <data key="name" unique="suffix">Simple_Product_PO_Price_987_65_</data>
+        <data key="price">987.65</data>
+        <data key="visibility">4</data>
+        <data key="status">1</data>
+        <requiredEntity type="product_extension_attribute">EavStockItem</requiredEntity>
+        <requiredEntity type="custom_attribute_array">CustomAttributeCategoryIds</requiredEntity>
+    </entity>
+    <entity name="SimpleProductForPurchaseOrder_Price_1000_01" type="product">
+        <data key="sku" unique="suffix">simple-product-po-price-1000-01-</data>
+        <data key="type_id">simple</data>
+        <data key="attribute_set_id">4</data>
+        <data key="name" unique="suffix">Simple_Product_PO_Price_1000_01_</data>
+        <data key="price">1000.01</data>
+        <data key="visibility">4</data>
+        <data key="status">1</data>
+        <requiredEntity type="product_extension_attribute">EavStockItem</requiredEntity>
+        <requiredEntity type="custom_attribute_array">CustomAttributeCategoryIds</requiredEntity>
+    </entity>
+    <entity name="SimpleProductForPurchaseOrder_Price_1100" type="product">
+        <data key="sku" unique="suffix">simple-product-po-price-1100-</data>
+        <data key="type_id">simple</data>
+        <data key="attribute_set_id">4</data>
+        <data key="name" unique="suffix">Simple_Product_PO_Price_1100_</data>
+        <data key="price">1100</data>
+        <data key="visibility">4</data>
+        <data key="status">1</data>
+        <requiredEntity type="product_extension_attribute">EavStockItem</requiredEntity>
+        <requiredEntity type="custom_attribute_array">CustomAttributeCategoryIds</requiredEntity>
+    </entity>
+    <entity name="SetProductZeroQuantity" type="product">
+        <data key="quantity">0</data>
+        <requiredEntity type="product_extension_attribute">EavStock0</requiredEntity>
+    </entity>
+</entities>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontSelectAllPOsInGridActionGroup">
+        <annotations>
+            <description>Selects all purchase orders and verifies that all orders are selected.</description>
+        </annotations>
+        <arguments>
+            <argument name="count" defaultValue="1" type="string"/>
+            <argument name="tabName" defaultValue="" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.selectAllDropdown(tabName)}}" stepKey="waitForSelectAllDropdown"/>
+        <click selector="{{StorefrontPurchaseOrderGridSection.selectAllDropdown(tabName)}}" stepKey="clickSelectAllDropDown"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.select(tabName, 'Select All')}}" stepKey="waitForSelectAllElement"/>
+        <click selector="{{StorefrontPurchaseOrderGridSection.select(tabName, 'Select All')}}" stepKey="clickSelectAllSelector"/>
+        <executeJS function="return document.querySelectorAll('{{StorefrontPurchaseOrderGridSection.singleCheckboxChecked(tabName)}}').length" stepKey="selectedQty"/>
+        <assertEquals stepKey="assertSelectedPurchaseOrdersQty">
+            <actualResult type="const">$selectedQty</actualResult>
+            <expectedResult type="const">{{count}}</expectedResult>
+        </assertEquals>
+    </actionGroup>
+</actionGroups>

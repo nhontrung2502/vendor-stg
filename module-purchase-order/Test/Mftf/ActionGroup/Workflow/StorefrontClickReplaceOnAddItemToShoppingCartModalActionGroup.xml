@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontClickReplaceOnAddItemToShoppingCartModalActionGroup">
+        <annotations>
+            <description>Clicks the Replace button on the Add Item to Shopping Cart modal that appears when shopping
+                cart is not empty. Modal opens by clicking the Add Item to Shopping Cart button from a Purchase Order
+                details page on the storefront</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.replaceButton}}" stepKey="waitForReplaceButton"/>
+        <click selector="{{StorefrontPurchaseOrderViewSection.replaceButton}}" stepKey="clickReplaceButton"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <seeInCurrentUrl url="{{CheckoutCartPage.url}}" stepKey="assertUrl"/>
+    </actionGroup>
+</actionGroups>

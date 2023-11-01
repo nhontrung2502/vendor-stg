@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminValidateQuotesRowInGridActionGroup">
+        <annotations>
+            <description>Validates that the provided data are present and correct in the grid</description>
+        </annotations>
+        <arguments>
+            <argument name="quoteNo" defaultValue="" type="string"/>
+            <argument name="createdDate" defaultValue="" type="string"/>
+            <argument name="lastUpdate" defaultValue="" type="string"/>
+            <argument name="salesRep" defaultValue="" type="string"/>
+            <argument name="baseQuoteTotal" defaultValue="" type="string"/>
+            <argument name="negotiatedQuoteTotal" defaultValue="" type="string"/>
+            <argument name="status" defaultValue="created" type="string"/>
+            <argument name="index" defaultValue="1" type="string"/>
+        </arguments>
+        <waitForText selector="{{AdminCustomerQuotesGridSection.quoteNumber(index)}}" userInput="{{quoteNo}}" stepKey="waitForQuoteNo"/>
+        <waitForText selector="{{AdminCustomerQuotesGridSection.createdDate(index)}}" userInput="{{createdDate}}" stepKey="waitForCreatedDate"/>
+        <waitForText selector="{{AdminCustomerQuotesGridSection.lastUpdated(index)}}" userInput="{{lastUpdate}}" stepKey="waitForLastUpdate"/>
+        <waitForText selector="{{AdminCustomerQuotesGridSection.salesRep(index)}}" userInput="{{salesRep}}" stepKey="waitForSalesRep"/>
+        <waitForText selector="{{AdminCustomerQuotesGridSection.quoteTotalBase(index)}}" userInput="{{baseQuoteTotal}}" stepKey="waitForBaseQuoteTotal"/>
+        <waitForText selector="{{AdminCustomerQuotesGridSection.quoteTotalNegotiated(index)}}" userInput="{{negotiatedQuoteTotal}}" stepKey="waitForNegotiatedQuoteTotal"/>
+        <waitForText selector="{{AdminCustomerQuotesGridSection.status(index)}}" userInput="{{status}}" stepKey="waitForStatus"/>
+    </actionGroup>
+</actionGroups>

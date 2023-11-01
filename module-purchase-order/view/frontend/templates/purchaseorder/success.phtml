@@ -1,0 +1,41 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\PurchaseOrder\Block\PurchaseOrder\Success */
+/** @var $escaper \Magento\Framework\Escaper */
+/** @var $viewModel \Magento\PurchaseOrder\ViewModel\PurchaseOrder\Success */
+
+$viewModel = $block->getViewModel();
+$purchaseOrderAnchor = sprintf(
+    '<a class="purchase-order-number-link" href="%s">' .
+        '<strong>#<span class="purchase-order-number">%s</span></strong>' .
+    '</a>',
+    $escaper->escapeUrl($block->getPurchaseOrderUrl()),
+    $escaper->escapeHtml($block->getPurchaseOrder()->getIncrementId())
+);
+
+$purchaseOrderSuccessHtml = __('Your Purchase Order request number is %1', $purchaseOrderAnchor);
+?>
+
+<div class="checkout-success">
+    <p><?= $escaper->escapeHtml($purchaseOrderSuccessHtml, ['a', 'span', 'strong']) ?></p>
+    <?php if ($viewModel->getPaymentStrategy()->isDeferredPayment($block->getPurchaseOrder())): ?>
+    <p class="purchase-order-payment-message">
+        <?= $escaper->escapeHtml(
+            __('You will be asked to enter your payment details after your purchase order has been approved.')
+        ) ?>
+    </p>
+    <?php endif; ?>
+    <p><?= $escaper->escapeHtml(__('A copy of this Purchase Order will be emailed to you shortly.')) ?></p>
+
+    <div class="actions-toolbar">
+        <div class="primary">
+            <a class="action primary continue" href="<?= $escaper->escapeUrl($block->getContinueUrl()) ?>">
+                <span><?= $escaper->escapeHtml(__('Continue Shopping')) ?></span>
+            </a>
+        </div>
+    </div>
+</div>

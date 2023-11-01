@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminB2BConfigSection">
+        <element name="orderApprovalConfigurationDropdown" type="select" selector="#btob_order_approval-head" timeout="60"/>
+        <element name="enablePurchaseOrders" type="select" selector="#btob_order_approval_purchaseorder_active" timeout="60"/>
+        <element name="enablePurchaseOrdersInherit" type="checkbox" selector="#btob_order_approval_purchaseorder_active_inherit" timeout="60"/>
+    </section>
+</sections>

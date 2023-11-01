@@ -1,0 +1,40 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Items $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+// Get Purchase Order id from email template
+$purchaseOrderId = $block->getPurchaseOrderId();
+$block->setPurchaseOrderById($purchaseOrderId);
+?>
+<table class="email-items">
+    <thead>
+    <tr>
+        <th class="item-info">
+            <?= $escaper->escapeHtml(__('Items')) ?>
+        </th>
+        <th class="item-qty">
+            <?= $escaper->escapeHtml(__('Qty')) ?>
+        </th>
+        <th class="item-price">
+            <?= $escaper->escapeHtml(__('Price')) ?>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($block->getItems() as $item): ?>
+        <?php if (!$item->isDeleted() && !$item->getParentItemId()): ?>
+            <?= $block->getItemHtml($item) ?>
+        <?php endif ?>
+    <?php endforeach; ?>
+    </tbody>
+    <tfoot class="order-totals">
+        <?= $block->getChildHtml() ?>
+    </tfoot>
+</table>

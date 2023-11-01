@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontOpenNegotiableQuoteActionGroup">
+        <arguments>
+            <argument name="quoteName" type="string"/>
+        </arguments>
+        <amOnPage url="{{StorefrontNegotiableQuotePage.url}}" stepKey="goToNegotiableQuotePage"/>
+        <waitForElementVisible selector="{{StorefrontMyQuoteGridSection.viewQuoteByName(quoteName)}}" stepKey="waitForQuoteVisible"/>
+        <click selector="{{StorefrontMyQuoteGridSection.viewQuoteByName(quoteName)}}" stepKey="clickViewButton"/>
+        <waitForElementVisible selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" stepKey="waitForElementVisible"/>
+        <see selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" userInput="Quote {{quoteName}}" stepKey="seeOpenedQuote"/>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontValidatePurchaseOrderApprovalRequiredActionGroup">
+        <annotations>
+            <description>Validates the available actions for an admin on a purchase order with the status of Approval required</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderStatus(PurchaseOrderStatuses.approvalRequired)}}" stepKey="waitForStatusChange"/>
+        <seeElement selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderApproveButton}}" stepKey="verifyApproveAvailable"/>
+        <seeElement selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderRejectButton}}" stepKey="verifyRejectAvailable"/>
+        <seeElement selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderCancelButton}}" stepKey="verifyCancelAvailable"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.placeOrderButton}}" stepKey="verifyPlaceOrderNotAvailable"/>
+    </actionGroup>
+</actionGroups>

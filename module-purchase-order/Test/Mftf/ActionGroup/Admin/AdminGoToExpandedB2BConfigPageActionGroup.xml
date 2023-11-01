@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminGoToExpandedB2BConfigPageActionGroup">
+        <annotations>
+            <description>Goes to the admin Store > Configuration > B2B Features page and expands the Order Approval Configuration section</description>
+        </annotations>
+        <conditionalClick selector="{{AdminB2BConfigSection.orderApprovalConfigurationDropdown}}" dependentSelector="{{AdminB2BConfigSection.enablePurchaseOrders}}" visible="false" stepKey="expandOrderApprovalConfiguration" after="waitForConfigurationPageTitle"/>
+        <waitForElementVisible selector="{{AdminB2BConfigSection.enablePurchaseOrders}}" stepKey="waitForEnablePurchaseOrders" after="expandOrderApprovalConfiguration"/>
+    </actionGroup>
+</actionGroups>

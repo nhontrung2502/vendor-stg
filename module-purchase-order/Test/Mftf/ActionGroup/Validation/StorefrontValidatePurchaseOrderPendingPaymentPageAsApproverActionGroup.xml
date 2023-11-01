@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontValidatePurchaseOrderPendingPaymentPageAsApproverActionGroup">
+        <annotations>
+            <description>Verify that Purchase Order page does not contain Place Order button and has relevant message.</description>
+        </annotations>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.placeOrderBanner}}" userInput="This purchase order has been approved but the payment details must be updated." stepKey="seePaymentDetailsRequired" />
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.placeOrderBannerLink}}" stepKey="dontSeePlaceOrderBannerLink" />
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.placeOrderButton}}" stepKey="dontSeePlaceOrderButton" />
+    </actionGroup>
+</actionGroups>

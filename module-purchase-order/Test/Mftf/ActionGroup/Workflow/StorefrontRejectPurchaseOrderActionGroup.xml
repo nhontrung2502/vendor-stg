@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontRejectPurchaseOrderActionGroup" extends="StorefrontApprovePurchaseOrderActionGroup">
+        <annotations>
+            <description>Rejects a purchase order on the storefront and verifies status change. Must be on the View Purchase Order page</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderRejectButton}}" stepKey="waitForButton"/>
+        <click selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderRejectButton}}" stepKey="clickButton"/>
+        <see userInput="Purchase order has been successfully rejected." selector="{{StorefrontMessagesSection.success}}" stepKey="seeSuccessMessage"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderStatus(PurchaseOrderStatuses.rejected)}}" stepKey="waitForStatusChange"/>
+    </actionGroup>
+</actionGroups>

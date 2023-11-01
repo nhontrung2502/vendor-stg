@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontVerifyPurchaseOrderExistsInGridActionGroup">
+        <annotations>
+            <description>Verifies that the specified purchase order exists in the grid on the Purchase Order listing page on the storefront.</description>
+        </annotations>
+        <arguments>
+            <argument name="purchaseOrderNumber" defaultValue="" type="string"/>
+            <argument name="gridName" defaultValue="my" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRowActionView(gridName, purchaseOrderNumber)}}" stepKey="waitForViewButton"/>
+    </actionGroup>
+</actionGroups>

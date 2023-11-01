@@ -1,0 +1,20 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject Quote {{var data.quote_name}} expires soon @-->
+<!--@vars {
+"var data.quote_name":"Quote Name",
+"var data.expiration_period":"Expiration Period",
+"var quote_url":"Quote URL",
+"var merchant_name":"Merchant Name",
+"var store.frontend_name":"Store Frontend Name"
+} @-->
+
+<p class="greeting">{{trans "Dear %merchant_name," merchant_name=$merchant_name}}</p>
+<p>{{trans "The quote "}}<a href="{{var quote_url}}">{{var data.quote_name}}</a>{{trans " expires on "}}
+    <b>{{var data.expiration_period}}</b>,{{trans " after which time it will be reset to its default expiration period. To extend the
+    lifetime of the quote, update its expiration date."}}</p>
+<br /><p>{{trans "Thank you,"}}</p><p>{{trans "%store_name" store_name=$store.frontend_name |raw}}</p>

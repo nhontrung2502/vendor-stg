@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontPurchaseOrderSuccessSection">
+        <element name="pageTitle" type="text" selector="#maincontent [data-ui-id='page-title-wrapper']" timeout="30"/>
+        <element name="purchaseOrderLink" type="text" selector="//a[contains(@class,'purchase-order-number-link')]" timeout="30"/>
+        <element name="purchaseOrderNumber" type="text" selector="//a//span[contains(@class,'purchase-order-number')]" timeout="30"/>
+    </section>
+</sections>

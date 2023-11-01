@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Sales::sales">
+                    <resource id="Magento_Sales::sales_operation">
+                        <resource id="Magento_NegotiableQuote::view_quotes" title="Quotes" translate="title" sortOrder="5">
+                            <resource id="Magento_NegotiableQuote::print" title="Print" translate="title" sortOrder="20"/>
+                            <resource id="Magento_NegotiableQuote::save_as_draft" title="Save as Draft" translate="title" sortOrder="30"/>
+                            <resource id="Magento_NegotiableQuote::decline" title="Decline" translate="title" sortOrder="40"/>
+                            <resource id="Magento_NegotiableQuote::send" title="Send" translate="title" sortOrder="50"/>
+                        </resource>
+                    </resource>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="Magento_NegotiableQuote::config_quotes" title="Quotes Section" translate="title" sortOrder="110"/>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

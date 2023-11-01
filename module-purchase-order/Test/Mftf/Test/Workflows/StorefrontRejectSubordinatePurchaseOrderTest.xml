@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontRejectSubordinatePurchaseOrderTest" extends="StorefrontApproveSubordinatePurchaseOrderTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Reject Subordinate's Purchase Order"/>
+            <description value="Verify that a manager can reject a subordinate's purchase order"/>
+            <severity value="BLOCKER"/>
+            <testCaseId value="MC-33002"/>
+            <useCaseId value="B2B-309, B2B-362"/>
+            <group value="purchase_orders"/>
+        </annotations>
+        <actionGroup ref="StorefrontRejectPurchaseOrderActionGroup" stepKey="approvePurchaseOrder"/>
+        <!-- Verify Purchase Order History tab -->
+        <actionGroup ref="StorefrontVerifyHistoryLogMessageActionGroup" stepKey="checkHistoryLog">
+            <argument name="index" value="1"/>
+            <argument name="logMessage" value='Purchase Order #$purchaseOrderId was Rejected By {{CompanySupervisorUser.fullname}}'/>
+            <argument name="date" value="{$poApprovedTime}"/>
+        </actionGroup>
+        <!-- Verify PO Status on Company POs Tab -->
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusInGridActionGroup" stepKey="verifyPOStatusInGrid">
+            <argument name="gridName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderId"/>
+            <argument name="status" value="{{PurchaseOrderStatuses.rejected}}"/>
+        </actionGroup>
+    </test>
+</tests>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontCheckPurchaseOrderFromPurchaseOrderGridActionGroup">
+        <annotations>
+            <description>Check 1 purchase order by its ID</description>
+        </annotations>
+        <arguments>
+            <argument name="purchaseOrderNumber" defaultValue="" type="string"/>
+            <argument name="tabName" defaultValue="" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.singleCheckboxByOrderId(tabName, purchaseOrderNumber)}}" stepKey="waitForPurchaseOrderCheckBox"/>
+        <checkOption selector="{{StorefrontPurchaseOrderGridSection.singleCheckboxByOrderId(tabName, purchaseOrderNumber)}}" stepKey="checkPurchaseOrderById"/>
+    </actionGroup>
+</actionGroups>

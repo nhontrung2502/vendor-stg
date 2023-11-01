@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontCreatePurchaseOrderFromNegotiableQuoteTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Create Purchase Order from Negotiable Quote"/>
+            <title value="Create Purchase Order from Negotiable Quote"/>
+            <description value="Verify Purchase Order can be created from Negotiable Quote in checkout"/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-33166"/>
+            <useCaseId value="B2B-565"/>
+            <group value="purchase_orders"/>
+            <group value="negotiable_quotes"/>
+        </annotations>
+        <before>
+            <!-- Enable Negotiable Quotes -->
+            <magentoCLI command="config:set {{EnableB2BQuoteConfigData.path}} {{EnableB2BQuoteConfigData.value}}" stepKey="enableNegotiableQuotes"/>
+            <createData entity="SimpleSubCategory" stepKey="category"/>
+            <createData entity="SimpleProductForPurchaseOrder_Price_987_65" stepKey="product1">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+            <createData entity="CustomerEntityOne" stepKey="createCompanyAdmin"/>
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="Simple_US_Customer_CA_NY_Addresses" stepKey="createPurchaseOrderCreatorCustomer"/>
+            <!-- Enable Company Order Approvals -->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createCompany.id$"/>
+                <argument name="companyName" value="$createCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrderForCompany"/>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="saveCompany"/>
+            <!-- Assign Purchaser to Company -->
+            <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerEditPage">
+                <argument name="customerId" value="$$createPurchaseOrderCreatorCustomer.id$"/>
+            </actionGroup>
+            <actionGroup ref="AdminAddACompanyToCustomerActionGroup" stepKey="assignPurchaserToCompany">
+                <argument name="companyName" value="$$createCompany.company_name$$"/>
+            </actionGroup>
+        </before>
+        <after>
+            <magentoCLI command="config:set {{DisableB2BQuoteConfigData.path}} {{DisableB2BQuoteConfigData.value}}" stepKey="disableNegotiableQuotes"/>
+            <deleteData createDataKey="product1" stepKey="deleteProduct1"/>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <actionGroup ref="AdminDeleteCompanyActionGroup" stepKey="deleteCompany">
+                <argument name="companyName" value="$$createCompany.company_name$$"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutStorefront"/>
+            <deleteData createDataKey="createPurchaseOrderCreatorCustomer" stepKey="deletePurchaser"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteCompanyAdmin"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+            <comment userInput="BIC workaround" stepKey="logoutCompanyAdmin"/>
+        </after>
+
+        <!-- Log in as company admin -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+
+        <!-- Toggle view purchase orders permission on -->
+        <actionGroup ref="StorefrontNavigateToRolesAndPermissionsPageActionGroup" stepKey="navigateToRolesAndPermissionsPage"/>
+        <actionGroup ref="StorefrontClickEditForRoleInRolesGridActionGroup" stepKey="clickEditForRoleInRolesGrid">
+            <argument name="roleName" value="Default User"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="toggleViewPurchaseOrdersPermission">
+            <argument name="permissionId" value="Magento_PurchaseOrder::view_purchase_orders" />
+        </actionGroup>
+        <actionGroup ref="StorefrontSaveCompanyRoleActionGroup" stepKey="saveCompanyRole">
+            <argument name="roleName" value="Default User"/>
+        </actionGroup>
+
+        <!-- Log out of company admin -->
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCompanyAdmin" />
+
+        <!-- Log in as purchaser -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser1">
+            <argument name="Customer" value="$$createPurchaseOrderCreatorCustomer$$"/>
+        </actionGroup>
+
+        <!-- Add product to cart -->
+        <actionGroup ref="AddSimpleProductToCartActionGroup" stepKey="addProduct1ToCart">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+
+        <!-- Go to checkout cart page -->
+        <actionGroup ref="StorefrontCartPageOpenActionGroup" stepKey="goToCheckoutCartPage"/>
+
+        <!-- Create Negotiable Quote -->
+        <actionGroup ref="StorefrontRequestQuoteActionGroup" stepKey="createNegotiableQuote">
+            <argument name="quote" value="DefaultNegotiableQuote" />
+        </actionGroup>
+
+        <!-- See quote in grid -->
+        <waitForElementVisible selector="{{StorefrontMyQuoteGridSection.quoteRowByName(DefaultNegotiableQuote.name)}}" stepKey="seeQuotePresentGrid"/>
+        <!-- Go to negotiable quote page for the newly created negotiable quote -->
+        <click selector="{{StorefrontMyQuoteGridSection.viewQuoteByName(DefaultNegotiableQuote.name)}}" stepKey="clickViewButton"/>
+        <waitForPageLoad stepKey="waitForViewQuote"/>
+
+        <!-- Grab negotiable quote id from single view page -->
+        <grabFromCurrentUrl regex="~/quote_id/(\d+)/~" stepKey="negotiableQuoteId"/>
+        <!-- See negotiable quote status is "Submitted" -->
+        <see selector="{{StorefrontNegotiableQuoteViewSection.statusQuote}}" userInput="Submitted" stepKey="seeStorefrontNegotiableQuoteStatusIsSubmitted"/>
+        <!-- Assert Proceed to checkout button is not visible -->
+        <dontSee selector="{{StorefrontNegotiableQuoteViewSection.proceedToCheckout}}" stepKey="doNotSeeProceedToCheckoutButton"/>
+
+        <!-- Select Existing Address -->
+        <actionGroup ref="StorefrontNegotiableQuoteSelectCustomerAddressAsShippingAddressActionGroup" stepKey="selectCustomerAddressAsShippingAddress"/>
+
+        <!-- Send for Review to Merchant -->
+        <waitForElementVisible selector="{{StorefrontNegotiableQuoteViewSection.sendForReview}}" stepKey="waitForSendForReview"/>
+        <click selector="{{StorefrontNegotiableQuoteViewSection.sendForReview}}" stepKey="clickSendForReview"/>
+        <waitForPageLoad stepKey="waitForSuccessfulPageLoad"/>
+        <waitForText userInput="The quote has been sent to the merchant." stepKey="seeSuccessMessage"/>
+
+        <!-- Go to negotiable quote page in admin -->
+        <amOnPage url="{{AdminNegotiableQuoteViewPage.url({$negotiableQuoteId})}}" stepKey="goToNegotiableQuoteInAdmin"/>
+        <waitForPageLoad stepKey="waitForNegotiableQuotePageToFinishLoading"/>
+
+        <!-- Lock in shipping method for quote -->
+        <actionGroup ref="AdminNegotiableQuoteSelectShippingMethodActionGroup" stepKey="chooseFlatRateShippingMethod"/>
+
+        <!-- Negotiate percentage discount for quote -->
+        <waitForElementVisible selector="{{AdminNegotiableQuoteViewSection.percentageDiscount}}" stepKey="waitForPercentageDiscount"/>
+        <fillField selector="{{AdminNegotiableQuoteViewSection.percentageDiscount}}" userInput="10" stepKey="fillFieldPercentageDiscount"/>
+        <!-- Unfocus on input to trigger price recalculation -->
+        <click selector="{{AdminGridHeaders.title}}" stepKey="clickTitle"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+
+        <!-- Grab negotiated quote grand total -->
+        <grabTextFrom selector="{{AdminNegotiableQuoteTotalsSection.quoteGrandTotal}}" stepKey="quoteGrandTotal" />
+
+        <!-- Send Quote to Buyer -->
+        <waitForElementVisible selector="{{AdminNegotiableQuoteViewSection.sendQuote}}" stepKey="waitForSendQuoteButton"/>
+        <click selector="{{AdminNegotiableQuoteViewSection.sendQuote}}" stepKey="clickSendQuoteButton"/>
+        <waitForPageLoad stepKey="waitForSendQuoteToFinish"/>
+        <waitForText userInput="This quote is currently locked for editing. It will become available once released by the buyer." stepKey="seeNoticeMessage"/>
+
+        <!-- Go back to Quote on Storefront as Purchaser -->
+        <amOnPage url="{{StorefrontNegotiableQuoteViewPage.url({$negotiableQuoteId})}}" stepKey="goToQuoteOnStorefront"/>
+
+        <!-- Assert negotiated grand total is used -->
+        <waitForText selector="{{StorefrontNegotiableQuoteViewSection.quoteGrandTotal}}" userInput="{$quoteGrandTotal}" stepKey="assertGrandTotal"/>
+
+        <!-- Click "Proceed to Checkout" button -->
+        <waitForElementVisible selector="{{StorefrontNegotiableQuoteViewSection.proceedToCheckout}}" stepKey="waitForProceedToCheckoutButton"/>
+        <click selector="{{StorefrontNegotiableQuoteViewSection.proceedToCheckout}}" stepKey="clickProceedToCheckoutButton"/>
+        <waitForPageLoad stepKey="waitForCheckout"/>
+
+        <!-- Verify shipping address data is locked for editing -->
+        <dontSee selector="{{CheckoutShippingAddressSection.changeAddressInPopupButton}}" stepKey="dontSeeChangeAddressLink"/>
+        <see selector="{{CheckoutShippingSection.quoteAddressLockedMessage}}" userInput="{{NegotiableQuoteMessages.shippingAddressLockedMessage}}" stepKey="quoteAddressIsLockedMessageIsDisplayed"/>
+
+        <!-- Go through checkout steps -->
+        <comment userInput="BIC workaround" stepKey="waitForNext"/>
+        <actionGroup ref="StorefrontCheckoutClickNextButtonActionGroup" stepKey="clickNext3"/>
+        <comment userInput="BIC workaround" stepKey="waitForNextLoad"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton"/>
+        <!-- Assert button reads "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Purchase Order" stepKey="seePlaceOrderButton" />
+        <!-- Place purchase order -->
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrderButton"/>
+        <comment userInput="BIC workaround" stepKey="waitForPageLoad2"/>
+
+        <!-- Grab purchase order increment id and url from success page -->
+        <waitForElement selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="waitForPurchaseOrderIncrementId" />
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderIncrementId" />
+        <grabAttributeFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderLink}}" userInput="href" stepKey="purchaseOrderUrlFromSuccessPage" />
+
+        <!-- Go to newly created purchase order page -->
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderLink}}" stepKey="waitForPurchaseOrderLink" />
+        <click selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderLink}}" stepKey="clickPurchaseOrderLink" />
+        <waitForPageLoad stepKey="waitForPurchaseOrderPageToLoad" />
+
+        <!-- Grab grand total from purchase order -->
+        <waitForElement selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderGrandTotal}}" stepKey="waitForPurchaseOrderGrandTotal" />
+        <grabTextFrom selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderGrandTotal}}" stepKey="purchaseOrderGrandTotal" />
+
+        <!-- Assert purchase order's grand total matches negotiable quote's grand total -->
+        <assertEquals stepKey="assertPurchaseOrderGrandTotalIsEqualToNegotiableQuoteGrandTotal">
+            <expectedResult type="variable">$quoteGrandTotal</expectedResult>
+            <actualResult type="variable">$purchaseOrderGrandTotal</actualResult>
+        </assertEquals>
+
+        <!-- Go to negotiable quote page after purchase order creation -->
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.viewNegotiableQuoteLink}}" stepKey="seeNegotiableQuoteHyperlink"/>
+        <click stepKey="clickNegotiableQuoteLink" selector="{{StorefrontPurchaseOrderViewSection.viewNegotiableQuoteLink}}" />
+        <switchToNextTab stepKey="switchToNextTab"/>
+        <waitForPageLoad stepKey="waitForQuotePage" />
+
+        <!-- See negotiable quote status is "Purchase Order in Progress" -->
+        <see selector="{{StorefrontNegotiableQuoteViewSection.statusQuote}}" userInput="Purchase Order in Progress" stepKey="seeStorefrontNegotiableQuoteStatusIsAwaitingApproval"/>
+
+        <!-- Assert link to associated Purchase Order is present and correct -->
+        <see selector="{{StorefrontNegotiableQuoteViewSection.purchaseOrderHyperlink}}" userInput="#{$purchaseOrderIncrementId}" stepKey="seePurchaseOrderHyperlink"/>
+        <grabAttributeFrom selector="{{StorefrontNegotiableQuoteViewSection.purchaseOrderHyperlink}}" userInput="href" stepKey="purchaseOrderUrlFromNegotiableQuotePage"/>
+        <assertEquals stepKey="assertPurchaseOrderUrlIsCorrect">
+            <expectedResult type="variable">purchaseOrderUrlFromSuccessPage</expectedResult>
+            <actualResult type="variable">purchaseOrderUrlFromNegotiableQuotePage</actualResult>
+        </assertEquals>
+
+        <!-- Assert send for review and proceed to checkout buttons are disabled-->
+        <seeElement selector="{{StorefrontNegotiableQuoteViewSection.sendForReviewDisabled}}" stepKey="seeDisabledSendForReviewButton" />
+        <seeElement selector="{{StorefrontNegotiableQuoteViewSection.proceedToCheckoutDisabled}}" stepKey="seeDisabledProceedToCheckoutButton" />
+        <closeTab stepKey="closeNegotiableQuoteTab" />
+
+        <!-- Log out purchaser -->
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutPurchaser1" />
+
+        <!-- Login as Company Admin and Place Order -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin2">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+
+        <actionGroup ref="StorefrontNavigateToCompanyPurchaseOrdersPageActionGroup" stepKey="navigateToCompanyPurchaseOrdersPage"/>
+        <actionGroup ref="StorefrontNavigateToViewPurchaseOrderPageActionGroup" stepKey="navigateToViewPurchaseOrderPageAsAdmin">
+            <argument name="tabName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderIncrementId"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontApprovePurchaseOrderAsAdminActionGroup" stepKey="approvePurchaseOrder"/>
+        <actionGroup ref="StorefrontPlacePurchaseOrderActionGroup" stepKey="placePurchaseOrderAsAdmin">
+            <argument name="purchaseOrderNumber" value="$purchaseOrderIncrementId"/>
+        </actionGroup>
+
+        <waitForElementVisible stepKey="waitForOrderLinkInPurchaseOrder" selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderOrderLink}}" />
+        <click stepKey="clickOrderLinkInPurchaseOrder" selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderOrderLink}}" />
+        <switchToNextTab stepKey="switchToNextTab2"/>
+        <waitForPageLoad stepKey="waitForOrderLoad"/>
+        <waitForElementVisible selector="{{StorefrontOrderDetailsSection.purchaseOrderLink(purchaseOrderIncrementId)}}" stepKey="waitForOrderLink"/>
+
+        <waitForElementVisible selector="{{StorefrontOrderDetailsSection.negotiableQuoteReference}}" stepKey="waitForNegotiableQuoteReference" />
+        <grabTextFrom selector="{{StorefrontOrderDetailsSection.negotiableQuoteReference}}" stepKey="negotiableQuoteReferenceText" />
+        <assertEquals stepKey="assertNegotiableQuoteReferenceText">
+            <expectedResult type="string">Quote: {{DefaultNegotiableQuote.name}}</expectedResult>
+            <actualResult type="variable">$negotiableQuoteReferenceText</actualResult>
+        </assertEquals>
+        <grabAttributeFrom selector="{{StorefrontOrderDetailsSection.negotiableQuoteReferenceLink}}" userInput="href" stepKey="negotiableQuoteHref" />
+        <assertStringContainsString stepKey="assertNegotiableQuoteReferenceLinkContainsNegotiableQuoteIdInPath">
+            <expectedResult type="string">/quote_id/{$negotiableQuoteId}/</expectedResult>
+            <actualResult type="variable">$negotiableQuoteHref</actualResult>
+        </assertStringContainsString>
+
+        <waitForElementVisible selector="{{StorefrontOrderDetailsSection.purchaseOrderLink}}" stepKey="waitForPurchaseOrderLinkInOrder" />
+        <click selector="{{StorefrontOrderDetailsSection.purchaseOrderLink}}" stepKey="clickPurchaseOrderLinkInOrder" />
+        <switchToNextTab stepKey="switchToNextTab3"/>
+        <waitForPageLoad stepKey="waitForPurchaseOrderPage" />
+        <actionGroup ref="StorefrontValidatePurchaseOrderIdActionGroup" stepKey="assertPurchaseOrderId">
+            <argument name="purchaseOrderId" value="$purchaseOrderIncrementId"/>
+        </actionGroup>
+        <closeTab stepKey="closePurchaseOrderTab" />
+        <closeTab stepKey="closeOrderTab" />
+    </test>
+</tests>

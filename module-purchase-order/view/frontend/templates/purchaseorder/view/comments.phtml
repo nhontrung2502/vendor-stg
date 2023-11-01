@@ -1,0 +1,29 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Comments $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="purchase-order-comments-block">
+    <div class="comments-block-list">
+        <?php foreach ($block->getPurchaseOrderComments() as $comment): ?>
+            <div class="comments-block-item">
+                <span class="comments-block-item-date-time">
+                    <?= $escaper->escapeHtml(
+                        $block->formatDate($comment->getCreatedAt(), \IntlDateFormatter::MEDIUM, true)
+                    ) ?>
+                    <?= $escaper->escapeHtml($block->getCommentCreator($comment)) ?>
+                </span>
+                <div class="comments-block-item-comment">
+                    <?php $escapedComment = $escaper->escapeHtml($comment->getComment()); ?>
+                    <?= /* @noEscape */ nl2br($escapedComment) ?>
+                </div>
+            </div>
+        <?php endforeach ?>
+    </div>
+</div>

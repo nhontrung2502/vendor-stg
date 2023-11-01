@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontWriteCommentInPurchaseOrderActionGroup">
+        <annotations>
+            <description>Write a comment into the Purchase Order comment box, to be submitted by a PO action or the add comment button</description>
+        </annotations>
+        <arguments>
+            <argument name="comment" defaultValue="{{PurchaseOrderDefaultComment.comment}}" type="string" />
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.commentTextarea}}" stepKey="waitForTextArea" />
+        <fillField selector="{{StorefrontPurchaseOrderViewSection.commentTextarea}}" userInput="{{comment}}" stepKey="fillCommentTextarea" />
+        <waitForPageLoad stepKey="waitForFillCommentTextarea" />
+    </actionGroup>
+</actionGroups>

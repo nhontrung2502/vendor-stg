@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontPurchaseOrderGridSection">
+        <element name="purchaseOrderGrid" type="text" timeout="30" parameterized="true" selector="#{{gridName}}-purchase-orders"/>
+        <element name="purchaseOrderGridTab" type="button" timeout="30" parameterized="true" selector="#tab-label-items-{{tabName}}-purchase-orders"/>
+        <element name="purchaseOrderRowActionView" type="button" timeout="30" parameterized="true" selector="//div[@id='{{gridName}}-purchase-orders']//td[@data-th='PO #']//div[contains(.,'{{purchaseOrderNumber}}')]/ancestor::tr//a[contains(.,'View')]"/>
+        <element name="purchaseOrderRowStatus" type="button" timeout="30" parameterized="true" selector="//div[@id='{{gridName}}-purchase-orders']//td[@data-th='PO #']//div[contains(.,'{{purchaseOrderNumber}}')]/ancestor::tr//div[contains(.,'{{purchaseOrderStatus}}')]"/>
+        <element name="purchaseOrderRowCreatedTime" type="text" timeout="30" parameterized="true" selector="//div[@id='{{gridName}}-purchase-orders']//td[@data-th='PO #']//div[contains(.,'{{purchaseOrderNumber}}')]/ancestor::tr//td[@data-th='Created']/div"/>
+        <element name="purchaseOrderRowUpdatedTime" type="text" timeout="30" parameterized="true" selector="//div[@id='{{gridName}}-purchase-orders']//td[@data-th='PO #']//div[contains(.,'{{purchaseOrderNumber}}')]/ancestor::tr//td[@data-th='Updated']/div"/>
+        <element name="purchaseOrderApproveSelectedButton" type="button" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .buttons button.approve"/>
+        <element name="purchaseOrderApproveSelectedButtonDisabled" type="button" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .buttons button.approve[disabled]"/>
+        <element name="purchaseOrderRejectSelectedButton" type="button" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .buttons button.reject"/>
+        <element name="purchaseOrderRejectSelectedButtonDisabled" type="button" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .buttons button.reject[disabled]"/>
+        <element name="selectedCount" type="text" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .action-select-wrap .selected-number"/>
+        <element name="selectAllDropdown" type="button" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .action-multicheck-wrap .action-multicheck-toggle"/>
+        <element name="select" type="text" timeout="30" parameterized="true" selector="//div[@id='{{tabName}}-purchase-orders']//ul[@class='action-menu']//li//span[text()='{{var}}']"/>
+        <element name="selectAllCheckbox" type="input" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .action-multicheck-wrap input[type='checkbox']"/>
+        <element name="singleCheckbox" type="input" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .data-grid-wrap tr.data-row td .data-grid-checkbox-cell-inner input[type='checkbox']"/>
+        <element name="singleCheckboxByOrderId" type="input" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .data-grid-wrap tr.data-row td .data-grid-checkbox-cell-inner input#idscheck{{var}}"/>
+        <element name="singleCheckboxByOrderIdDisabled" type="input" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .data-grid-wrap tr.data-row td .data-grid-checkbox-cell-inner input#idscheck{{var}}:disabled"/>
+        <element name="singleCheckboxChecked" type="input" timeout="30" parameterized="true" selector="#{{tabName}}-purchase-orders .data-grid-wrap tr.data-row td .data-grid-checkbox-cell-inner input[type=\'checkbox\']:checked"/>
+    </section>
+</sections>

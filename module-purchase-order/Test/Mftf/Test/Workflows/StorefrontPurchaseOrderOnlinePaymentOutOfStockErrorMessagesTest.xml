@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontPurchaseOrderOnlinePaymentOutOfStockErrorMessagesTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Verify Online Payment Method Purchase Order Error Messages When Product Item Out Of Stock"/>
+            <description value="Verify for a purchase order that is in the `Approved - Pending Payment` status, when a
+            product item in the purchase order is out of stock, then the appropriate error messages appear for the
+            purchase order and for the product item, and that the Place Order buttons for the purchase order are not
+            available for the buyer."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="B2B-964"/>
+            <group value="purchase_orders"/>
+        </annotations>
+
+        <before>
+            <!-- Enable PayPal, Create Company Admin, 1 Customer, & 1 Product -->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminPayPalExpressCheckoutEnableActionGroup" stepKey="configPaypalExpressCheckout" />
+            <createData entity="CompanyAdminUser" stepKey="createCompanyAdmin"/>
+            <createData entity="CompanyRegularPurchaser" stepKey="createPurchaseOrderCreatorCustomer"/>
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="SimpleSubCategory" stepKey="category"/>
+            <createData entity="SimpleProductForPurchaseOrder_Price_987_65" stepKey="product1">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+
+            <!-- Enable Company Order Approvals -->
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createCompany.id$"/>
+                <argument name="companyName" value="$createCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrderForCompany"/>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="SaveCompany"/>
+
+            <!-- Assign Purchase Order Creator Customer to Company -->
+            <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerEditPagePurchaser">
+                <argument name="customerId" value="$$createPurchaseOrderCreatorCustomer.id$"/>
+            </actionGroup>
+            <actionGroup ref="AdminAddACompanyToCustomerActionGroup" stepKey="assignPurchaserCustomerToCompany">
+                <argument name="companyName" value="$$createCompany.company_name$$"/>
+            </actionGroup>
+
+            <!-- Enable View Purchase Orders Permission for Default User Rule -->
+            <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+                <argument name="Customer" value="$$createCompanyAdmin$$"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontNavigateToRolesAndPermissionsPageActionGroup" stepKey="navigateToRolesAndPermissionsPage"/>
+            <actionGroup ref="StorefrontClickEditForRoleInRolesGridActionGroup" stepKey="clickEditForRoleInRolesGrid">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableViewPurchaseOrdersPermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::view_purchase_orders"/>
+            </actionGroup>
+
+            <!-- Enable Auto-Approve Purchase Orders Permission for Default User Rule -->
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableAutoApprovePermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::autoapprove_purchase_order"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontSaveCompanyRoleActionGroup" stepKey="saveCompanyRole">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCompanyAdmin"/>
+        </before>
+
+        <after>
+            <!-- Revert Configurations & Delete Data -->
+            <actionGroup ref="AdminPayPalExpressCheckoutDisableActionGroup" stepKey="configPaypalExpressCheckoutDisable" />
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="adminLogout"/>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="storefrontLogout"/>
+            <deleteData createDataKey="createPurchaseOrderCreatorCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createCompany" stepKey="deleteCompany"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteAdminCustomer"/>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <deleteData createDataKey="product1" stepKey="deleteProduct1"/>
+        </after>
+
+        <!-- Create Purchase Order -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser">
+            <argument name="Customer" value="$$createPurchaseOrderCreatorCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep"/>
+        <actionGroup ref="StorefrontPurchaseOrderCheckoutSelectPayPalExpressActionGroup" stepKey="selectPayPalExpress" />
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderId"/>
+
+        <!-- Verify PO is in 'Approved - Pending Payment' Status -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovalRequired">
+            <argument name="status" value="{{PurchaseOrderStatuses.approvedPendingPayment}}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderPendingPaymentPageAsBuyerActionGroup" stepKey="verifyPageAppearanceForBuyer"/>
+
+        <!-- Update Product to Zero Quantity & Reload Page -->
+        <updateData entity="SetProductZeroQuantity" createDataKey="product1" stepKey="updateProductWithOutOfStock">
+            <requiredEntity createDataKey="product1"/>
+        </updateData>
+        <actionGroup ref="ReloadPageActionGroup" stepKey="reloadPage"/>
+
+        <!-- Verify Place Order Banner Error Message & Product Item Error Message -->
+        <actionGroup ref="StorefrontValidatePurchaseOrderPendingPaymentErrorMessagesActionGroup" stepKey="verifyPOErrorMessages">
+            <argument name="productItemSKU" value="$product1.sku$"/>
+            <argument name="productItemErrorMessage" value="There are no source items with the in stock status"/>
+        </actionGroup>
+    </test>
+</tests>

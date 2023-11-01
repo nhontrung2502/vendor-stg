@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="purchaseorder.toorder" request="string">
+        <handler name="purchase_order_to_order" type="Magento\PurchaseOrder\Model\QueueConsumer\PurchaseOrderToOrderConsumer" method="process" />
+    </topic>
+    <topic name="purchaseorder.transactional.email" request="string">
+        <handler name="purchase_transactional_email" type="Magento\PurchaseOrder\Model\QueueConsumer\PurchaseOrderTransEmailConsumer" method="process" />
+    </topic>
+</config>

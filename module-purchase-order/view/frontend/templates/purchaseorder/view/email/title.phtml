@@ -1,0 +1,29 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Info\Title $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+// Get Purchase Order id from email template
+$purchaseOrderId = $block->getPurchaseOrderId();
+$block->setPurchaseOrderById($purchaseOrderId);
+?>
+<h1>
+    <?= $escaper->escapeHtml(__('Purchase Order #%1', $block->getPurchaseOrder()->getIncrementId())) ?>
+</h1>
+<p>
+    <?php
+    $createdAt = $block->formatDate(
+        $block->getPurchaseOrder()->getCreatedAt(),
+        \IntlDateFormatter::MEDIUM,
+        true
+    );
+    $createdBy = $block->getCreatorName();
+    ?>
+    <?= $escaper->escapeHtml(__('Placed on %1 by %2', $createdAt, $createdBy)) ?>
+</p>

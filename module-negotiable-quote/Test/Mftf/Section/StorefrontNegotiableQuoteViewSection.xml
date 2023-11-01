@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontNegotiableQuoteViewSection">
+        <element name="quoteName" type="text" selector="div.quote-name"/>
+        <element name="quoteTitle" type="text" selector=".base[data-ui-id='page-title-wrapper']" deprecated="Use StorefrontCustomerAccountMainSection.pageTitle instead"/>
+        <element name="viewOrderHyperLinkInQuotes" type="text" selector="a[title='View Order']"/>
+        <element name="quoteSubtotal" type="text" selector="#shopping-cart-table-totals tr.proposed_quote_price span.price"/>
+        <element name="quoteGrandTotal" type="text" selector="#shopping-cart-table-totals tr.grand_total span.price"/>
+        <element name="quoteCatalogTotal" type="text" selector="#shopping-cart-table-totals tr.catalog_price span.price"/>
+        <element name="quoteCatalogSubtotal" type="text" selector="#shopping-cart-table-totals div[data-role='catalog-price'] tr.subtotal span.price"/>
+        <element name="quoteCatalogSubtotalInclTax" type="text" selector="#shopping-cart-table-totals div[data-role='catalog-price'] tr.subtotalTax span.price"/>
+        <element name="catalogTax" type="text" selector="#shopping-cart-table-totals div[data-role='catalog-price'] tr.tax span.price"/>
+        <element name="totalTax" type="text" selector="#shopping-cart-table-totals tr.quote_tax span.price"/>
+
+        <element name="skuNoticeMessage" type="text" selector="//table[@id='sku_errors_table']//div[@class='messages']//div[@data-role='message-notice']"/>
+        <element name="sendForReview" type="button" selector="button[title='Send for Review']" timeout="30"/>
+        <element name="sendForReviewDisabled" type="button" selector="//button[@title='Send for Review'][@disabled]" timeout="30"/>
+        <element name="historyLog" type="button" selector="#tab-label-history-log-title"/>
+        <element name="selectExistingAddressButton" type="button" selector="//a[@data-role='edit-address']" timeout="5"/>
+        <element name="noticeMessage" type="button" selector="//div[@data-ui-id='messages-message-notice']" timeout="5"/>
+        <element name="proceedToCheckout" type="button" selector="//div[contains(@class, 'quote-view-buttons')]//button[@title='Proceed to Checkout']" timeout="30"/>
+        <element name="proceedToCheckoutDisabled" type="button" selector="//button[@title='Proceed to Checkout'][@disabled]" timeout="30"/>
+        <element name="getShippingMethodsAndRates" type="button" selector="//a[@data-action='get-shipping']" timeout="30"/>
+        <element name="flatRateShippingMethod" type="radio" selector="//input[@value='flatrate_flatrate']" timeout="30"/>
+        <element name="inputQtyDisabled" type="input" selector="div.control.qty > input[disabled]"/>
+        <element name="buttonRemoveDisabled" type="button" selector=".actions-toolbar ._disabled"/>
+        <element name="fieldComments" type="input" selector="#negotiation_comment"/>
+        <element name="statusQuote" type="text" selector="#quote-status-field"/>
+        <element name="quoteExpirationDate" type="text" selector=".quote-date-expired"/>
+        <element name="quoteShippingAddress" type="text" selector="#quote-address > address"/>
+        <!--Items Quoted Grid -->
+        <element name="sectionItemsQuoted" type="block" selector="#items-quoted"/>
+        <element name="productNameRow" type="text" selector=".product-item-name > a"/>
+        <element name="productQty" type="input" selector="//input[@data-cart-item-id='{{productSKU}}']" parameterized="true"/>
+        <element name="productPrice" type="text" selector="//a[@title='{{productName}}']/../following-sibling::td[@class='col subtotal']/span" parameterized="true"/>
+        <element name="detailsBundleProduct" type="text" selector="//dl/dd"/>
+        <element name="bundleOption" type="text" selector="//dl/dt"/>
+        <element name="createdFrom" type="input" selector="input[name='created_at[from]']"/>
+        <element name="createdTo" type="input" selector="input[name='created_at[to]']"/>
+        <element name="lastUpdatedFrom" type="input" selector="input[name='updated_at[from]']"/>
+        <element name="lastUpdatedTo" type="input" selector="input[name='updated_at[to]']"/>
+        <element name="tableHeadItem" type="text" selector="//table[contains(@class, 'data-grid')]/thead//th[contains(@class, 'data-grid-th')]/span[contains(text(), '{{itemName}}')]" parameterized="true"/>
+
+        <element name="productLinkByName" type="text" selector="//a[contains(text(), '{{productName}}')]" parameterized="true"/>
+        <element name="productPriceByName" type="text" selector="//a[contains(text(), '{{productName}}')]/ancestor::tr//td[contains(@class, 'price')]//span[contains(@class, 'price')]" parameterized="true"/>
+        <element name="productSubtotalByName" type="text" selector="//a[contains(text(), '{{productName}}')]/ancestor::tr//td[contains(@class, 'subtotal')]//span[contains(@class, 'price')]" parameterized="true"/>
+        <element name="productQtyByName" type="input" selector="//a[contains(text(), '{{productName}}')]/ancestor::tr//td[contains(@class, 'qty')]//input[contains(@class,'qty')]" parameterized="true"/>
+        <element name="productPriceExcludingTaxByName" type="text" selector="//a[contains(text(), '{{productName}}')]/ancestor::tr//td[contains(@class, 'price')]//span[contains(@class,'price-excluding-tax')]//span[contains(@class,'cart-tax-total')]//span[contains(@class, 'price')]" parameterized="true"/>
+        <element name="productSubtotalExcludingTaxByName" type="text" selector="//a[contains(text(), '{{productName}}')]/ancestor::tr//td[contains(@class, 'subtotal')]//span[contains(@class,'price-excluding-tax')]//span[contains(@class,'cart-tax-total')]//span[contains(@class, 'price')]" parameterized="true"/>
+
+        <element name="deleteLink" type="button" selector="//a[@role='delete-quote']" />
+        <element name="modalDeleteConfirm" selector="//*[@role='dialog'][contains(@class, '_show')]//button[@class='action-primary action-accept']" type="button"/>
+        <element name="salesRep" type="text" timeout="30" selector="//div[@class='quote-sales-rep']"/>
+    </section>
+</sections>

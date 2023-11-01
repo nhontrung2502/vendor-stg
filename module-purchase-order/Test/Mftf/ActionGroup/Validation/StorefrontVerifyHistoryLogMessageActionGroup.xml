@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontVerifyHistoryLogMessageActionGroup">
+        <annotations>
+            <description>Validate the History Log for a specific message and its date.</description>
+        </annotations>
+        <arguments>
+            <argument name="index" type="string" defaultValue="1"/>
+            <argument name="logMessage" type="string" defaultValue=""/>
+            <argument name="date" type="string" defaultValue=""/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderHistorySection.content}}" stepKey="waitForHistoryLogContent"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderHistorySection.logMessage(index)}}" stepKey="waitForLogMessageVisible"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderHistorySection.logDate(index)}}" stepKey="waitForLogDateVisible"/>
+        <see selector="{{StorefrontPurchaseOrderHistorySection.logMessage(index)}}" userInput="{{logMessage}}" stepKey="seeHistoryLogMessage"/>
+        <see selector="{{StorefrontPurchaseOrderHistorySection.logDate(index)}}" userInput="{{date}}" stepKey="seeHistoryLogMessageDate"/>
+    </actionGroup>
+</actionGroups>

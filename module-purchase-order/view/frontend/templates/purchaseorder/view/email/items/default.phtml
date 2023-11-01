@@ -1,0 +1,58 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var $block \Magento\Checkout\Block\Cart\Item\Renderer
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $viewModel \Magento\PurchaseOrder\ViewModel\Quote\Items
+ */
+
+$viewModel = $block->getViewModel();
+$item = $block->getItem();
+$product = $item->getProduct();
+
+$baseCurrency = $item->getQuote()->getCurrency()->getBaseCurrencyCode();
+$quoteCurrency = $item->getQuote()->getCurrency()->getQuoteCurrencyCode();
+$productUrl = $block->getProductUrl() ?: '';
+?>
+<tr>
+    <td class="item-info<?php if ($block->getOptionList()): ?> has-extra<?php endif; ?>">
+        <p class="product-name"><?= $escaper->escapeHtml($block->getProductName()) ?></p>
+        <p class="sku">
+            <?= $escaper->escapeHtml(__('SKU')) ?>: <?= $escaper->escapeHtml($product->getSku()) ?>
+        </p>
+        <?php if ($options = $block->getOptionList()): ?>
+            <dl class="item-options">
+                <?php foreach ($options as $option): ?>
+                    <dt>
+                        <strong>
+                            <em>
+                                <?= $escaper->escapeHtml($option['label']) ?>
+                            </em>
+                        </strong>
+                    </dt>
+                    <dd>
+                        <?php $formattedOptionValue = $block->getFormatedOptionValue($option) ?>
+                        <?php if (isset($formattedOptionValue['full_view'])): ?>
+                            <?= $escaper->escapeHtml($formattedOptionValue['full_view']) ?>
+                        <?php else: ?>
+                            <?= $escaper->escapeHtml($formattedOptionValue['value']) ?>
+                        <?php endif; ?>
+                    </dd>
+                <?php endforeach; ?>
+            </dl>
+        <?php endif; ?>
+    </td>
+    <td class="item-qty">
+        <?= $escaper->escapeHtml($block->getQty()) ?>
+    </td>
+    <td class="item-price">
+        <?= $escaper->escapeHtml(
+            $viewModel->getPriceFormatter()->getItemTotal($item, $quoteCurrency, $baseCurrency),
+            ['span']
+        ) ?>
+    </td>
+</tr>

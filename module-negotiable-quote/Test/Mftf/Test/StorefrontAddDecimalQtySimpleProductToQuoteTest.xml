@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAddDecimalQtySimpleProductToQuoteTest">
+        <annotations>
+            <stories value="Negotiable Quotes"/>
+            <features value="NegotiableQuote"/>
+            <title value="Add simple product with decimal quantity to quote."/>
+            <description value="Add and verify simple product with decimal quantity to quote on storefront."/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-38415"/>
+            <group value="negotiable_quotes"/>
+        </annotations>
+        <before>
+            <!--Set configuration.-->
+            <magentoCLI command="config:set {{EnableCompanyConfigData.path}} {{EnableCompanyConfigData.value}}" stepKey="enableCompany"/>
+            <magentoCLI command="config:set {{EnableB2BQuoteConfigData.path}} {{EnableB2BQuoteConfigData.value}}" stepKey="enableB2BQuote"/>
+            <!--Create test data.-->
+            <createData entity="Simple_US_Customer" stepKey="companyAdmin"/>
+            <createData entity="Default_Company" stepKey="company">
+                <requiredEntity createDataKey="companyAdmin"/>
+            </createData>
+            <createData entity="_defaultCategory" stepKey="category"/>
+            <createData entity="SimpleProduct" stepKey="product">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+            <!--Enable qty use decimals for created simple product.-->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminProductPageOpenByIdActionGroup" stepKey="openSimpleProductEditPage">
+                <argument name="productId" value="$product.id$"/>
+            </actionGroup>
+            <actionGroup ref="AdminClickOnAdvancedInventoryLinkActionGroup" stepKey="openAdvanceInventoryModal"/>
+            <actionGroup ref="AdminSetQtyUsesDecimalsConfigActionGroup" stepKey="enableQtyUseIncrements">
+                <argument name="value" value="Yes"/>
+            </actionGroup>
+            <actionGroup ref="AdminSubmitAdvancedInventoryFormActionGroup" stepKey="clickDoneButton"/>
+            <actionGroup ref="SaveProductFormActionGroup" stepKey="saveProductForm"/>
+        </before>
+        <after>
+            <!-- Apply default configuration settings -->
+            <magentoCLI command="config:set {{DisableCompanyConfigData.path}} {{DisableCompanyConfigData.value}}" stepKey="disableCompany"/>
+            <magentoCLI command="config:set {{DisableB2BQuoteConfigData.path}} {{DisableB2BQuoteConfigData.value}}" stepKey="disableB2BQuote"/>
+            <!--Clean up test data.-->
+            <deleteData createDataKey="company" stepKey="deleteCompany"/>
+            <deleteData createDataKey="companyAdmin" stepKey="deleteCompanyAdmin"/>
+            <deleteData createDataKey="product" stepKey="deleteProduct"/>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <!--Log out from admin area.-->
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <!--Add simple product to cart.-->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsCompanyAdmin">
+            <argument name="Customer" value="$companyAdmin$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddSimpleProductToShoppingCartActionGroup" stepKey="addSimpleProductToCart">
+            <argument name="product" value="$product$"/>
+            <argument name="qty" value="3.5"/>
+        </actionGroup>
+        <actionGroup ref="ClickViewAndEditCartFromMiniCartActionGroup" stepKey="navigateToCartPage"/>
+        <!-- Request a quote -->
+        <actionGroup ref="StorefrontRequestQuoteActionGroup" stepKey="requestQuote">
+            <argument name="quote" value="DefaultNegotiableQuote"/>
+        </actionGroup>
+        <!--Verify negotiable quote-->
+        <actionGroup ref="StorefrontOpenNegotiableQuoteActionGroup" stepKey="openNegotiableQuote">
+            <argument name="quoteName" value="{{DefaultNegotiableQuote.name}}"/>
+        </actionGroup>
+        <actionGroup ref="AssertStorefrontNegotiableQuoteItemActionGroup" stepKey="verifyProductDetails">
+            <argument name="productName" value="$product.name$"/>
+            <argument name="productPrice" value="$product.price$"/>
+            <argument name="subtotal" value="$430.50"/>
+            <argument name="qty" value="3.5"/>
+        </actionGroup>
+    </test>
+</tests>

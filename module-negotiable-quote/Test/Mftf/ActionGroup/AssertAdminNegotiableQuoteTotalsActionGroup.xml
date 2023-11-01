@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AssertAdminNegotiableQuoteTotalsActionGroup">
+        <annotations>
+            <description>Validates that the provided Subtotal/Total are present and correct in admin.</description>
+        </annotations>
+        <arguments>
+            <argument name="subtotal" defaultValue="100" type="string"/>
+            <argument name="total" defaultValue="100" type="string"/>
+            <argument name="catalogTotal" defaultValue="100" type="string"/>
+            <argument name="catalogSubtotal" defaultValue="100" type="string"/>
+        </arguments>
+
+        <waitForElementVisible selector="{{AdminNegotiableQuoteTotalsSection.quoteSubtotal}}" stepKey="waitForTotalBlockLoaded"/>
+        <see selector="{{AdminNegotiableQuoteTotalsSection.quoteSubtotal}}" userInput="{{subtotal}}" stepKey="assertQuoteSubtotal"/>
+        <see selector="{{AdminNegotiableQuoteTotalsSection.quoteGrandTotal}}" userInput="{{total}}" stepKey="assertGrandTotal"/>
+        <see selector="{{AdminNegotiableQuoteTotalsSection.quoteCatalogTotal}}" userInput="{{catalogTotal}}" stepKey="assertCatalogTotal"/>
+        <click selector="{{AdminNegotiableQuoteTotalsSection.quoteCatalogTotal}}" stepKey="openCatalogTotals"/>
+        <waitForElementVisible selector="{{AdminNegotiableQuoteTotalsSection.quoteCatalogSubtotal}}" stepKey="waitForCatalogSubtotalBlockOpened"/>
+        <see selector="{{AdminNegotiableQuoteTotalsSection.quoteCatalogSubtotal}}" userInput="{{catalogSubtotal}}" stepKey="assertCatalogSubtotal"/>
+    </actionGroup>
+</actionGroups>

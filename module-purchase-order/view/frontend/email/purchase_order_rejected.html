@@ -1,0 +1,36 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!--@subject {{trans "Purchase Order #%increment_id has been Rejected" increment_id=$data.purchase_order_increment_id}} @-->
+<!--@vars {
+"var store":"Store",
+"var data.purchase_order_increment_id":"Purchase Order Increment Id",
+"var data.purchase_order_id":"Purchase Order Id",
+"var data.recipient_full_name":"Recipient Full Name",
+"var data.rejecter_full_name":"Rejecter Full Name",
+"var this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])":"Purchase Order View Url"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table width="100%">
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans "%recipient_full_name," recipient_full_name=$data.recipient_full_name}}</p>
+            <p>
+                {{trans "Your Purchase Order <a href="%purchase_order_view_url">#%increment_id</a>"
+                    increment_id=$data.purchase_order_increment_id
+                    purchase_order_view_url=$this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])
+                |raw}}
+                {{trans "has been rejected by %rejecter_full_name." rejecter_full_name=$data.rejecter_full_name}}
+            </p>
+            <p>{{trans "Your Purchase Order details are below."}}</p>
+        </td>
+    </tr>
+    {{layout handle="email_purchaseorder_details" area="frontend" purchaseOrderId=$data.purchase_order_id}}
+</table>
+
+{{template config_path="design/email/footer_template"}}

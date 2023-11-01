@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Block\Onepage">
+        <plugin name="add_purchase_order_config" type="Magento\PurchaseOrder\Plugin\Checkout\Model\ConfigProvider" />
+    </type>
+    <type name="Magento\Customer\CustomerData\SectionPoolInterface">
+        <arguments>
+            <argument name="sectionSourceMap" xsi:type="array">
+                <item name="purchase_order" xsi:type="string">
+                    Magento\PurchaseOrder\CustomerData\PurchaseOrder
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Company\CustomerData\Authorization">
+        <arguments>
+            <argument name="authorizationResources" xsi:type="array">
+                <item name="view_purchase_orders" xsi:type="string">Magento_PurchaseOrder::view_purchase_orders</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\NegotiableQuote\Api\Data\NegotiableQuoteInterface">
+        <plugin name="override_status_if_purchase_order_is_being_processed"
+                type="Magento\PurchaseOrder\Plugin\NegotiableQuote\Api\Data\NegotiableQuoteInterface\Status" />
+    </type>
+    <type name="Magento\NegotiableQuote\Ui\Component\Listing\Column\Status">
+        <plugin name="override_quote_status_label_in_listing_if_purchase_order_is_processing"
+                type="Magento\PurchaseOrder\Plugin\NegotiableQuote\Ui\Component\Listing\Column\Status" />
+    </type>
+    <type name="Magento\NegotiableQuote\Block\Quote\Info">
+        <plugin name="override_quote_status_label_in_info_if_purchase_order_is_processing"
+                type="Magento\PurchaseOrder\Plugin\NegotiableQuote\Block\Quote\Info" />
+    </type>
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="purchaseOrderRemoveDiscountCode" type="Magento\PurchaseOrder\Plugin\Checkout\Block\LayoutProcessorPlugin"/>
+    </type>
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="purchase_order_config_provider" xsi:type="object">Magento\PurchaseOrder\Model\PurchaseOrderConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

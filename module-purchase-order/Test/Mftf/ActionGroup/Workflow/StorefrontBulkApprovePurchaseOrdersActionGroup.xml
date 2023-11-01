@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontBulkApprovePurchaseOrdersActionGroup">
+        <annotations>
+            <description>Approves all selected purchase orders on the storefront and verifies status change. Must be on the Requires My Approval tab</description>
+        </annotations>
+        <arguments>
+            <argument name="messageText" defaultValue="" type="string"/>
+            <argument name="tabName" defaultValue="" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderApproveSelectedButton(tabName)}}" stepKey="waitForApproveButton"/>
+        <click selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderApproveSelectedButton(tabName)}}" stepKey="clickApprovalButton"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderBulkActionsModalSection.popupConfirm}}" stepKey="waitForConfirmationPopup"/>
+        <waitForText selector="{{StorefrontPurchaseOrderBulkActionsModalSection.modalContent}}" userInput="This action cannot be undone. Are you sure you want to approve the selected purchase orders?" stepKey="waitForConfirm"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderBulkActionsModalSection.ok}}" stepKey="waitForConfirmationButton"/>
+        <click selector="{{StorefrontPurchaseOrderBulkActionsModalSection.ok}}" stepKey="clickOk"/>
+        <waitForPageLoad stepKey="waitForPageLoad2"/>
+        <waitForText selector="{{StorefrontMessagesSection.success}}" userInput="{{messageText}}" stepKey="waitForSuccessMessageText"/>
+    </actionGroup>
+</actionGroups>

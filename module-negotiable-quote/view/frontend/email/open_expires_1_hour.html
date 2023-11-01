@@ -1,0 +1,17 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject Expiration date reset for Quote {{var data.quote_name}} @-->
+<!--@vars {
+"var data.quote_name":"Quote Name",
+"var merchant_name":"Merchant Name",
+"var store.frontend_name": "Store Frontend Name"
+} @-->
+
+<p class="greeting">{{trans "Dear %merchant_name," merchant_name=$merchant_name}}</p>
+<p>{{trans "Expiration date for the Quote %quoteName has been reset so you can keep working on the quote.
+    You can set a new expiration date if you wish." quoteName=$data.quote_name}}</p>
+<br /><p>{{trans "Thank you,"}}</p><p>{{trans "%store_name" store_name=$store.frontend_name |raw}}</p>

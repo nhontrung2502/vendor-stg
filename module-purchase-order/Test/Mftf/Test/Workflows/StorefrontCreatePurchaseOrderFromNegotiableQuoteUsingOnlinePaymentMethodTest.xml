@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontCheckoutPurchaseOrderFromNegotiableQuoteUsingOnlinePaymentMethodTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Checkout Purchase order created from Negotiable Quote"/>
+            <description value="Verify that a buyer can create a purchase order from negotiable quote using online payment method and place order using offline payment method"/>
+            <severity value="BLOCKER"/>
+            <useCaseId value="B2B-973"/>
+            <group value="purchase_orders"/>
+        </annotations>
+
+        <before>
+            <!-- Enable Negotiable Quotes & PayPal Express Checkout -->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <magentoCLI command="config:set {{EnableB2BQuoteConfigData.path}} {{EnableB2BQuoteConfigData.value}}" stepKey="enableNegotiableQuotes"/>
+            <actionGroup ref="AdminPayPalExpressCheckoutEnableActionGroup" stepKey="configPayPalExpressCheckout"/>
+            <actionGroup ref="CliCacheCleanActionGroup" stepKey="cleanFullPageCache">
+                <argument name="tags" value="config full_page"/>
+            </actionGroup>
+
+            <!-- Create Company Admin, 1 User, & 1 Product -->
+            <createData entity="CompanyAdminUser" stepKey="createCompanyAdmin"/>
+            <createData entity="CompanyRegularPurchaser" stepKey="createPurchaseOrderCreatorCustomer"/>
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="SimpleSubCategory" stepKey="category"/>
+            <createData entity="SimpleProductForPurchaseOrder_Price_987_65" stepKey="product1">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+
+            <!-- Enable Company Order Approvals -->
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createCompany.id$"/>
+                <argument name="companyName" value="$createCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrderForCompany"/>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="SaveCompany"/>
+
+            <!-- Assign Purchase Order Creator Customer to Company -->
+            <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerEditPagePurchaser">
+                <argument name="customerId" value="$$createPurchaseOrderCreatorCustomer.id$"/>
+            </actionGroup>
+            <actionGroup ref="AdminAddACompanyToCustomerActionGroup" stepKey="assignPurchaserCustomerToCompany">
+                <argument name="companyName" value="$$createCompany.company_name$$"/>
+            </actionGroup>
+
+            <!-- Enable View Purchase Orders Permission for Default User Role -->
+            <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+                <argument name="Customer" value="$$createCompanyAdmin$$"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontNavigateToRolesAndPermissionsPageActionGroup" stepKey="navigateToRolesAndPermissionsPage"/>
+            <actionGroup ref="StorefrontClickEditForRoleInRolesGridActionGroup" stepKey="clickEditForRoleInRolesGrid">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableViewPurchaseOrdersPermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::view_purchase_orders"/>
+            </actionGroup>
+
+            <!-- Enable Auto-Approve Purchase Orders Permission for Default User Role -->
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableAutoApprovePermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::autoapprove_purchase_order"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontSaveCompanyRoleActionGroup" stepKey="saveCompanyRole">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCompanyAdmin"/>
+        </before>
+
+        <after>
+            <!-- Revert Configurations & Delete Data -->
+            <magentoCLI command="config:set {{DisableB2BQuoteConfigData.path}} {{DisableB2BQuoteConfigData.value}}" stepKey="disableNegotiableQuotes"/>
+            <magentoCLI command="config:set {{StorefrontPaypalMerchantAccountIdConfigData.path}} {{StorefrontPaypalMerchantAccountIdConfigData.value}}" stepKey="deleteMerchantId"/>
+            <magentoCLI command="config:set {{StorefrontPaypalDisableInContextCheckoutConfigData.path}} {{StorefrontPaypalDisableInContextCheckoutConfigData.value}}" stepKey="disableInContextPayPal"/>
+            <magentoCLI command="config:set {{StorefrontPaypalDisableConfigData.path}} {{StorefrontPaypalDisableConfigData.value}}" stepKey="disablePayPal"/>
+            <createData entity="SamplePaypalConfig" stepKey="setDefaultPayPalConfig"/>
+            <actionGroup ref="CliCacheCleanActionGroup" stepKey="cleanFullPageCache">
+                <argument name="tags" value="config full_page"/>
+            </actionGroup>
+            <actionGroup ref="AdminDeleteCompanyActionGroup" stepKey="deleteCompany">
+                <argument name="companyName" value="$$createCompany.company_name$$"/>
+            </actionGroup>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <deleteData createDataKey="product1" stepKey="deleteProduct1"/>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="storefrontLogout"/>
+            <deleteData createDataKey="createPurchaseOrderCreatorCustomer" stepKey="deletePurchaser"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteCompanyAdmin"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="adminLogout"/>
+        </after>
+
+        <!-- Create Negotiable Quote as Company User with 1 Product -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser">
+            <argument name="Customer" value="$$createPurchaseOrderCreatorCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontCartPageOpenActionGroup" stepKey="goToCheckoutCartPage"/>
+        <actionGroup ref="StorefrontRequestQuoteActionGroup" stepKey="createNegotiableQuote">
+            <argument name="quote" value="DefaultNegotiableQuote"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenNegotiableQuoteActionGroup" stepKey="openNegotiableQuote">
+            <argument name="quoteName" value="{{DefaultNegotiableQuote.name}}"/>
+        </actionGroup>
+        <grabFromCurrentUrl regex="~/quote_id/(\d+)/~" stepKey="negotiableQuoteId"/>
+
+        <!-- Select Existing Address & Send for Review to Merchant -->
+        <actionGroup ref="StorefrontNegotiableQuoteSelectCustomerAddressAsShippingAddressActionGroup" stepKey="selectCustomerAddressAsShippingAddress">
+            <argument name="addressSearchTerm" value="New York"/>
+        </actionGroup>
+        <click selector="{{StorefrontNegotiableQuoteViewSection.sendForReview}}" stepKey="clickSendForReview"/>
+        <waitForPageLoad stepKey="waitForSuccessfulPageLoad"/>
+        <waitForText userInput="The quote has been sent to the merchant." stepKey="waitForSuccessMessage"/>
+
+        <!-- Lock Shipping Method for Quote as Merchant -->
+        <actionGroup ref="AdminGoToViewQuotePageActionGroup" stepKey="goToNegotiableQuoteInAdmin">
+            <argument name="quoteId" value="{$negotiableQuoteId}"/>
+        </actionGroup>
+        <actionGroup ref="AdminNegotiableQuoteSelectShippingMethodActionGroup" stepKey="chooseFlatRateShippingMethod"/>
+
+        <!-- Negotiate Percentage Discount -->
+        <waitForElementVisible selector="{{AdminNegotiableQuoteViewSection.percentageDiscount}}" stepKey="waitForPercentageDiscount"/>
+        <fillField selector="{{AdminNegotiableQuoteViewSection.percentageDiscount}}" userInput="10" stepKey="fillFieldPercentageDiscount"/>
+        <click selector="{{AdminGridHeaders.title}}" stepKey="unfocusDiscountField"/>
+        <waitForPageLoad stepKey="waitForPriceRecalculation"/>
+        <grabTextFrom selector="{{AdminNegotiableQuoteTotalsSection.quoteGrandTotal}}" stepKey="quoteGrandTotal"/>
+
+        <!-- Send Quote To Buyer -->
+        <waitForElementVisible selector="{{AdminNegotiableQuoteViewSection.sendQuote}}" stepKey="waitForSendQuoteButton"/>
+        <click selector="{{AdminNegotiableQuoteViewSection.sendQuote}}" stepKey="clickSendQuoteButton"/>
+        <waitForPageLoad stepKey="waitForSendQuoteToFinish"/>
+        <waitForText userInput="This quote is currently locked for editing. It will become available once released by the buyer." stepKey="waitForNoticeMessage"/>
+
+        <!-- Place Purchase Order from Quote as Purchaser with PayPal Express Payment Method -->
+        <actionGroup ref="StorefrontGoToNegotiableQuoteActionGroup" stepKey="goToQuoteOnStorefront">
+            <argument name="quoteId" value="{$negotiableQuoteId}"/>
+        </actionGroup>
+        <click selector="{{StorefrontNegotiableQuoteViewSection.proceedToCheckout}}" stepKey="clickProceedToCheckoutButton"/>
+        <waitForPageLoad stepKey="waitForCheckoutPage"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext"/>
+        <actionGroup ref="StorefrontPurchaseOrderCheckoutSelectPayPalExpressActionGroup" stepKey="selectPayPalExpress"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderInitialCheckoutDeferredPaymentActionGroup" stepKey="validateInitialCheckoutDeferredPayment"/>
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderNumber"/>
+
+        <!-- Verify PO is in 'Approved - Pending Payment' Status and Place Order Button and Link Are Visible to Buyer -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovalRequired">
+            <argument name="status" value="{{PurchaseOrderStatuses.approvedPendingPayment}}"/>
+        </actionGroup>
+        <grabFromCurrentUrl regex="~request_id\/(\d+)~" stepKey="purchaseOrderId"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderPendingPaymentPageAsBuyerActionGroup" stepKey="verifyPageAppearanceForBuyer"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.productName}}" userInput="$$product1.name$$" stepKey="seeProductNamePurchaseOrder"/>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderGrandTotal}}" userInput="{$quoteGrandTotal}" stepKey="seeGrandTotalPurchaseOrder"/>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.paymentMethod}}" userInput="PayPal Express Checkout" stepKey="seePaymentMethodPurchaseOrder"/>
+
+        <!-- Proceed to Final Checkout Payment Page -->
+        <actionGroup ref="StorefrontClickPlaceOrderLinkInBannerActionGroup" stepKey="clickPlaceOrderLink"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderFinalCheckoutPageActionGroup" stepKey="validateFinalCheckoutPage"/>
+
+        <!-- Select Check Money Order Payment Method & Place Order -->
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMO"/>
+        <actionGroup ref="ClickPlaceOrderActionGroup" stepKey="placeOrder"/>
+
+        <!-- Verify Created Order -->
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber22}}" stepKey="orderNumber"/>
+        <actionGroup ref="StorefrontOpenOrderFromSuccessPageActionGroup" stepKey="openOrderFromSuccessPage">
+            <argument name="orderNumber" value="{$orderNumber}"/>
+        </actionGroup>
+        <waitForText selector="{{StorefrontOrderDetailsSection.purchaseOrderLink}}" userInput="#{$purchaseOrderNumber}" stepKey="seePurchaseOrderLinkOrder"/>
+        <waitForText selector="{{StorefrontOrderDetailsSection.negotiableQuoteReferenceLink}}" userInput="{{DefaultNegotiableQuote.name}}" stepKey="seeQuoteLinkOrder"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.productName}}" userInput="$$product1.name$$" stepKey="seeProductNameOrder"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.grandTotal}}" userInput="{$quoteGrandTotal}" stepKey="seeGrandTotalOrder"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.paymentMethod}}" userInput="Check / Money order" stepKey="seePaymentMethodOrder"/>
+
+        <!-- Verify Negotiable Quote Status is "Ordered" -->
+        <actionGroup ref="StorefrontGoToNegotiableQuoteActionGroup" stepKey="goToQuoteOnStorefront2">
+            <argument name="quoteId" value="{$negotiableQuoteId}"/>
+        </actionGroup>
+        <see selector="{{StorefrontNegotiableQuoteViewSection.statusQuote}}" userInput="Ordered" stepKey="seeStorefrontNegotiableQuoteStatusIsOrdered"/>
+        <waitForText selector="{{StorefrontNegotiableQuoteViewSection.viewOrderHyperLinkInQuotes}}" userInput="#{$orderNumber}" stepKey="seeOrderLinkQuote"/>
+        <waitForText selector="{{StorefrontOrderDetailsSection.purchaseOrderLink}}" userInput="#{$purchaseOrderNumber}" stepKey="seePurchaseOrderLinkQuote"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.productName}}" userInput="$$product1.name$$" stepKey="seeProductNameQuote"/>
+        <waitForText selector="{{StorefrontNegotiableQuoteViewSection.quoteGrandTotal}}" userInput="{$quoteGrandTotal}" stepKey="seeGrandTotalQuote"/>
+
+        <!-- Verify Purchase Order Details & "Approved - Ordered" Status -->
+        <actionGroup ref="StorefrontGoToPurchaseOrderDetailsPageActionGroup" stepKey="goToPurchaseOrderDetailsPage">
+            <argument name="purchaseOrderId" value="{$purchaseOrderId}"/>
+            <argument name="purchaseOrderNumber" value="{$purchaseOrderNumber}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovedOrdered">
+            <argument name="status" value="{{PurchaseOrderStatuses.ordered}}"/>
+        </actionGroup>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderOrderLink}}" userInput="{$orderNumber}" stepKey="seeOrderLinkPurchaseOrder2"/>
+        <waitForText selector="{{StorefrontOrderDetailsSection.negotiableQuoteReferenceLink}}" userInput="{{DefaultNegotiableQuote.name}}" stepKey="seeQuoteLinkPurchaseOrder2"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.productName}}" userInput="$$product1.name$$" stepKey="seeProductNamePurchaseOrder2"/>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderGrandTotal}}" userInput="{$quoteGrandTotal}" stepKey="seeGrandTotalPurchaseOrder2"/>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.paymentMethod}}" userInput="PayPal Express Checkout" stepKey="seePaymentMethodPurchaseOrder2"/>
+    </test>
+</tests>

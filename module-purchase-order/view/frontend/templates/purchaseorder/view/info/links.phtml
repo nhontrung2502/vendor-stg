@@ -1,0 +1,16 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\PurchaseOrder\Block\PurchaseOrder\Info\Links $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<div class="actions">
+    <a href="#" data-post='<?=
+    /* @noEscape */ $block->getAddItemPostData()
+    ?>' class="action additem">
+        <span><?= $escaper->escapeHtml(__('Add Items to Shopping Cart')) ?></span>
+    </a>
+</div>

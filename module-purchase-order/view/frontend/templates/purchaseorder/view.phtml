@@ -1,0 +1,52 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\View $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$htmlClass = 'product data items purchase-order-data-items';
+
+if ($block->getNameInLayout() !== 'purchase.order.index.view') {
+    $htmlClass .= ' quote-details-items';
+}
+?>
+<div class="<?= $escaper->escapeHtmlAttr($htmlClass) ?>"
+     data-mage-init='{"negotiableQuoteTabs":{"openedState":"active", "saveState":true}}'>
+    <?php $layout = $block->getLayout();
+    foreach ($block->getSortedChildNames() as $name):
+        $html = $layout->renderElement($name);
+        if (!trim($html)) {
+            continue;
+        }
+        $childBlock = $layout->getBlock($name);
+        $alias = $layout->getElementAlias($name);
+
+        $label = $block->getChildData($alias, 'title');
+        $cssClasses = $block->getChildData($alias, 'css_class') ?? '';
+
+        ?>
+        <div class="data item title <?= $escaper->escapeHtmlAttr($alias); ?>"
+             aria-labeledby="tab-label-items-<?= $escaper->escapeHtmlAttr($alias); ?>"
+             data-role="collapsible" id="tab-label-<?= $escaper->escapeHtmlAttr($alias); ?>">
+            <a class="data switch"
+               tabindex="-1"
+               data-toggle="switch"
+               href="#<?= $escaper->escapeHtmlAttr($alias); ?>"
+               id="tab-label-items-<?= $escaper->escapeHtmlAttr($alias); ?>">
+                <?= $childBlock->getChildHtml('tab.link.label.before'); ?>
+                <?= $escaper->escapeHtml($label); ?>
+                <?= $childBlock->getChildHtml('tab.link.label.after'); ?>
+            </a>
+        </div>
+
+        <div class="data item content <?= $escaper->escapeHtmlAttr($cssClasses); ?>"
+             id="<?= $escaper->escapeHtmlAttr($alias); ?>" data-role="content">
+            <?= /* @noEscape */ $html ?>
+        </div>
+    <?php endforeach; ?>
+</div>
