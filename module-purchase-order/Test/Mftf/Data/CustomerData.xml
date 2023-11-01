@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="CompanyAdminUser" type="customer">
+        <data key="group_id">0</data>
+        <data key="default_billing">defaultBillingValue</data>
+        <data key="default_shipping">defaultShippingValue</data>
+        <data key="confirmation">confirmationData</data>
+        <data key="created_at">12:00</data>
+        <data key="updated_at">12:00</data>
+        <data key="created_in">createdInData</data>
+        <data key="dob">01-01-1970</data>
+        <data key="email" unique="prefix">test@email.com</data>
+        <data key="firstname">Company</data>
+        <data key="lastname">Admin</data>
+        <data key="middlename">S</data>
+        <data key="fullname">Company Admin</data>
+        <data key="password">pwdTest123!</data>
+        <data key="prefix">Mr</data>
+        <data key="suffix">Sr</data>
+        <data key="gender">0</data>
+        <data key="store_id">0</data>
+        <data key="taxvat">taxValue</data>
+        <data key="website_id">0</data>
+        <data key="status">Active</data>
+        <requiredEntity type="address">CustomerAddressSimple</requiredEntity>
+        <data key="disable_auto_group_change">0</data>
+        <!--requiredEntity type="extension_attribute">ExtensionAttributeSimple</requiredEntity-->
+    </entity>
+    <entity name="CompanySupervisorUser" type="customer">
+        <data key="group_id">1</data>
+        <data key="default_billing">true</data>
+        <data key="default_shipping">true</data>
+        <data key="email" unique="prefix">Supervisor@example.com</data>
+        <data key="firstname">Company</data>
+        <data key="lastname">Supervisor</data>
+        <data key="fullname">Company Supervisor</data>
+        <data key="password">pwdTest123!</data>
+        <data key="store_id">0</data>
+        <data key="website_id">0</data>
+        <data key="group">General</data>
+        <data key="status">Active</data>
+        <requiredEntity type="address">US_Address_TX</requiredEntity>
+    </entity>
+    <entity name="CompanySeniorSupervisorUser" type="customer">
+        <data key="group_id">1</data>
+        <data key="default_billing">true</data>
+        <data key="default_shipping">true</data>
+        <data key="email" unique="prefix">SeniorSupervisor@example.com</data>
+        <data key="firstname">Company</data>
+        <data key="lastname">SeniorSupervisor</data>
+        <data key="fullname">Company SeniorSupervisor</data>
+        <data key="password">pwdTest123!</data>
+        <data key="store_id">0</data>
+        <data key="website_id">0</data>
+        <data key="group">General</data>
+        <data key="status">Active</data>
+        <requiredEntity type="address">US_Address_TX</requiredEntity>
+    </entity>
+    <entity name="CompanyRegularPurchaser" type="customer">
+        <data key="group_id">0</data>
+        <data key="default_billing">true</data>
+        <data key="default_shipping">true</data>
+        <data key="email" unique="prefix">Purchaser@example.com</data>
+        <data key="firstname">Company</data>
+        <data key="lastname">Purchaser</data>
+        <data key="fullname">Company Purchaser</data>
+        <data key="password">pwdTest123!</data>
+        <data key="store_id">0</data>
+        <data key="website_id">0</data>
+        <data key="status">Active</data>
+        <requiredEntity type="address">US_Address_NY</requiredEntity>
+    </entity>
+    <entity name="CompanyApprover" type="customer">
+        <data key="group_id">0</data>
+        <data key="job_title">First Approver</data>
+        <data key="role">Approver</data>
+        <data key="default_billing">true</data>
+        <data key="default_shipping">true</data>
+        <data key="email" unique="prefix">Approver@example.com</data>
+        <data key="firstname">Company First</data>
+        <data key="lastname">Approver</data>
+        <data key="fullname">Company First Approver</data>
+        <data key="password">pwdTest123!</data>
+        <data key="store_id">0</data>
+        <data key="website_id">0</data>
+        <data key="telephone">555-555-5555</data>
+        <data key="status">Active</data>
+        <requiredEntity type="address">US_Address_NY</requiredEntity>
+    </entity>
+    <entity name="CompanySecondApprover" type="customer" extends="CompanyApprover">
+        <data key="job_title">Second Approver</data>
+        <data key="firstname">Company Second</data>
+        <data key="fullname">Company Second Approver</data>
+    </entity>
+    <entity name="CompanyApproverOther" type="customer" extends="CompanyApprover">
+        <data key="group_id">0</data>
+        <data key="job_title">Other Approver</data>
+        <data key="role">Other Approver</data>
+        <data key="email" unique="prefix">OtherApprover@example.com</data>
+        <data key="firstname">Other</data>
+        <data key="lastname">Approver</data>
+        <data key="fullname">Other Approver</data>
+    </entity>
+</entities>

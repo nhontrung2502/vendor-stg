@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontPlacePurchaseOrderActionGroup">
+        <annotations>
+            <description>Places an order for an approved purchase order on the storefront and verifies status change. Must be on the View Purchase Order page for an approved purchase order</description>
+        </annotations>
+        <arguments>
+            <argument name="purchaseOrderNumber" defaultValue="" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.placeOrderButton}}" stepKey="waitForButton"/>
+        <click selector="{{StorefrontPurchaseOrderViewSection.placeOrderButton}}" stepKey="clickButton"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <waitForElementVisible selector="{{StorefrontMessagesSection.success}}" stepKey="waitForSuccessMessage"/>
+        <see userInput="Successfully placed order #" selector="{{StorefrontMessagesSection.success}}" stepKey="seeSuccessMessage1"/>
+        <see userInput=" from purchase order #{{purchaseOrderNumber}}." selector="{{StorefrontMessagesSection.success}}" stepKey="seeSuccessMessage2"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderStatus(PurchaseOrderStatuses.ordered)}}" stepKey="waitForStatusChange"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderOrderLink}}" stepKey="waitForOrderLink"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.placeOrderButton}}" stepKey="verifyPlaceOrderNotAvailable"/>
+    </actionGroup>
+</actionGroups>

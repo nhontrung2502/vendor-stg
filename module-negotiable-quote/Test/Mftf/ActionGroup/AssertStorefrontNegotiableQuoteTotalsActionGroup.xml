@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AssertStorefrontNegotiableQuoteTotalsActionGroup">
+        <annotations>
+            <description>Validates that the provided Subtotal/Total are present and correct on storefront.</description>
+        </annotations>
+        <arguments>
+            <argument name="subtotal" defaultValue="100" type="string"/>
+            <argument name="total" defaultValue="100" type="string"/>
+            <argument name="catalogTotal" defaultValue="100" type="string"/>
+            <argument name="catalogSubtotal" defaultValue="100" type="string"/>
+        </arguments>
+
+        <see selector="{{StorefrontNegotiableQuoteViewSection.quoteSubtotal}}" userInput="{{subtotal}}" stepKey="assertQuoteSubtotal"/>
+        <see selector="{{StorefrontNegotiableQuoteViewSection.quoteGrandTotal}}" userInput="{{total}}" stepKey="assertGrandTotal"/>
+        <see selector="{{StorefrontNegotiableQuoteViewSection.quoteCatalogTotal}}" userInput="{{catalogTotal}}" stepKey="assertCatalogTotal"/>
+        <click selector="{{StorefrontNegotiableQuoteViewSection.quoteCatalogTotal}}" stepKey="openCatalogTotals"/>
+        <waitForElementVisible selector="{{StorefrontNegotiableQuoteViewSection.quoteCatalogSubtotal}}" stepKey="waitForCatalogSubtotalBlockOpened"/>
+        <see selector="{{StorefrontNegotiableQuoteViewSection.quoteCatalogSubtotal}}" userInput="{{catalogSubtotal}}" stepKey="assertCatalogSubtotal"/>
+    </actionGroup>
+</actionGroups>

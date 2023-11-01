@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StoreFrontCheckoutWithCustomCustomerAddressAttributeTest" deprecated="Use StorefrontVerifyCustomCustomerAddressAttributeTest instead">
+        <annotations>
+            <features value="Customer Checkout with Quote and Custom Address Attributes"/>
+            <stories value="Customer Address attribute code is displayed instead of attribute label during checkout"/>
+            <title value="Verify Custom dropdown customer address attribute value showing on checkout"/>
+            <description value="Custom customer address attributes fields is not showing at checkout for Negotiable Quote at Store Front"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-35833"/>
+            <group value="negotiable_quotes"/>
+            <group value="customer"/>
+            <group value="checkout"/>
+            <skip>
+                <issueId value="DEPRECATED">Use StorefrontVerifyCustomCustomerAddressAttributeTest instead</issueId>
+            </skip>
+            <group value="pr_exclude"/>
+        </annotations>
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdminForCustomAddressAttribute"/>
+            <!--Create product-->
+            <createData stepKey="category" entity="SimpleSubCategory"/>
+            <createData stepKey="product" entity="SimpleProduct">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+            <!-- Create customer -->
+            <createData entity="Simple_US_Customer" stepKey="createCustomer"/>
+        </before>
+        <after>
+            <!-- Logout customer -->
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="customerLogout"/>
+
+            <actionGroup ref="AdminDeleteCustomerAttribute" stepKey="adminDeleteFirstCustomerAttribute">
+                <argument name="defaultLabel" value="{{AttributeDropdownData.label}}"/>
+            </actionGroup>
+            <deleteData stepKey="deleteCategory" createDataKey="category"/>
+            <deleteData stepKey="deleteProduct" createDataKey="product"/>
+            <!-- Delete customer -->
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logOut"/>
+        </after>
+        <!--Create new attribute-->
+        <amOnPage url="{{CustomerAddressAttributesPage.url}}" stepKey="navigateToCustomerAddress"/>
+        <waitForPageLoad time="30" stepKey="timeToLoadAttributes"/>
+        <actionGroup ref="AdminAddOptionsCustomerAttribute" stepKey="adminCreateCustomerFirstAttribute">
+            <argument name="defaultLabel" value="{{AttributeDropdownData.label}}"/>
+            <argument name="attributeCode" value="{{AttributeDropdownData.code}}"/>
+            <argument name="inputType" value="{{AttributeDropdownData.inputType}}"/>
+            <argument name="sortOrder" value="{{AttributeDropdownData.sortOrder}}"/>
+            <argument name="firstOption" value="{{AttributeDropdownData.firstOption}}"/>
+            <argument name="secondOption" value="{{AttributeDropdownData.secondOption}}"/>
+        </actionGroup>
+        <!-- Login to Frontend -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsCustomer">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+        <!-- Update customer default shipping address -->
+        <actionGroup ref="UpdateStorefrontCustomerDefaultAddressActionGroup" stepKey="UpdateStorefrontCustomerDefaultAddress">
+            <argument name="defaultLabel" value="{{AttributeDropdownData.label}}"/>
+            <argument name="attributeCode" value="{{AttributeDropdownData.code}}"/>
+            <argument name="firstOption" value="{{AttributeDropdownData.firstOption}}"/>
+        </actionGroup>
+        <!--Go to Storefront. Add product to cart-->
+        <amOnPage url="/$$product.custom_attributes[url_key]$$.html" stepKey="GoToProduct"/>
+        <actionGroup ref="StorefrontAddToCartCustomOptionsProductPageActionGroup" stepKey="AddProductToCard">
+            <argument name="productName" value="$$product.name$$"/>
+        </actionGroup>
+        <!--Proceed to checkout-->
+        <click selector="{{StorefrontMinicartSection.showCart}}" stepKey="clickCart"/>
+        <click selector="{{StorefrontMinicartSection.goToCheckout}}" stepKey="goToCheckout"/>
+        <waitForPageLoad time="20" stepKey="waitForPageLoad"/>
+        <!-- Verify default shipping address consists of custom attribute value-->
+        <see selector="{{StorefrontCustomerAddressSection.seeCustomAttribute}}" userInput="{{AttributeDropdownData.firstOption}}"
+             stepKey="seeCustomDropdownAttribute"/>
+    </test>
+</tests>

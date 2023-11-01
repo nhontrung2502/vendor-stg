@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontValidatePurchaseOrderPendingPaymentErrorMessagesActionGroup">
+        <annotations>
+            <description>Verify that Purchase Order View page contains the expected error banner and error for the expected product item when the Purchase Order is in Approved - Pending Payment status.</description>
+        </annotations>
+        <arguments>
+            <argument name="bannerErrorMessage" defaultValue="This order could not be completed as some items are currently unavailable." type="string"/>
+            <argument name="productItemSKU" type="string"/>
+            <argument name="productItemErrorMessage" defaultValue="This product is out of stock." type="string"/>
+        </arguments>
+        <waitForText userInput="{{bannerErrorMessage}}" selector="{{StorefrontPurchaseOrderViewSection.placeOrderBannerError}}" stepKey="waitForPlaceOrderBannerErrorMessage"/>
+        <waitForText userInput="{{productItemErrorMessage}}" selector="{{StorefrontPurchaseOrderViewSection.productItemErrorBySKU(productItemSKU)}}" stepKey="waitForProductItemErrorMessage"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderViewSection.placeOrderButton}}" stepKey="dontSeePlaceOrderButton"/>
+    </actionGroup>
+</actionGroups>

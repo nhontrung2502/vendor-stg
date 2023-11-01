@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontValidatePurchaseOrderStatusInGridActionGroup">
+        <annotations>
+            <description>Validates that the purchase order has the expected status. Must be on the Purchase Order index page.</description>
+        </annotations>
+        <arguments>
+            <argument name="gridName" defaultValue="my" type="string"/>
+            <argument name="purchaseOrderNumber" defaultValue="" type="string"/>
+            <argument name="status" defaultValue="{{PurchaseOrderStatuses.approved}}" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRowStatus(gridName, purchaseOrderNumber, status)}}" stepKey="waitForPurchaseOrderStatus"/>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,13 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php if ($addressHtml = $block->getAddressHtml()) : ?>
+    <address>
+        <?= /* @noEscape */ $addressHtml ?>
+    </address>
+<?php else : ?>
+    <p><?= $block->escapeHtml(__('You have no shipping address for this quote.')) ?></p>
+<?php endif; ?>

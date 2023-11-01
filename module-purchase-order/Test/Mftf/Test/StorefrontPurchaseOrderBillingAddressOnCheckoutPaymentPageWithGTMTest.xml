@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontPurchaseOrderBillingAddressOnCheckoutPaymentPageWithGTMTest">
+        <annotations>
+            <features value="Checkout"/>
+            <stories value="Checkout via the Storefront"/>
+            <title value="The billing address should display without errors if GTM and Purchase Order payment method is enabled."/>
+            <description value="The billing address should display without errors if GTM and Purchase Order payment method is enabled."/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-39753"/>
+            <useCaseId value="MC-39620"/>
+            <group value="checkout"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCategory" stepKey="createCategory"/>
+            <createData entity="SimpleProduct" stepKey="createProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+            <!-- Enable Purchase Order payment method  -->
+            <magentoCLI command="config:set {{enabledPurchaseOrderPayment.label}} {{enabledPurchaseOrderPayment.value}}" stepKey="enableBankTransfer"/>
+            <!-- Enable Google Tag Manager -->
+            <magentoCLI command="config:set {{GoogleAnalyticsEnabled.path}} {{GoogleAnalyticsEnabled.value}}" stepKey="enableGoogleAnalytics"/>
+            <magentoCLI command="config:set {{GoogleAnalyticsGoogleTagManagerType.path}} {{GoogleAnalyticsGoogleTagManagerType.value}}" stepKey="enableGTM"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <!-- Roll back configuration -->
+            <magentoCLI command="config:set {{disabledPurchaseOrderPayment.label}} {{disabledPurchaseOrderPayment.value}}" stepKey="disableBankTransfer"/>
+            <magentoCLI command="config:set {{GoogleAnalyticsTypeByDefault.path}} {{GoogleAnalyticsTypeByDefault.value}}" stepKey="enableGoogleAnalyticsDefaultType"/>
+            <magentoCLI command="config:set {{GoogleAnalyticsDisabledByDefault.path}} {{GoogleAnalyticsDisabledByDefault.value}}" stepKey="disableGoogleAnalytics"/>
+            <!--Logout from customer account-->
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCustomer"/>
+        </after>
+        <!-- Add simple product to cart and go to checkout-->
+        <actionGroup ref="AddSimpleProductToCartActionGroup" stepKey="addProductToCart">
+            <argument name="product" value="$$createProduct$$"/>
+        </actionGroup>
+        <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckoutFromMinicart"/>
+        <actionGroup ref="GuestCheckoutFillingShippingSectionActionGroup" stepKey="guestCheckoutFillingShippingSection">
+            <argument name="customerVar" value="CustomerEntityOne"/>
+            <argument name="customerAddressVar" value="CustomerAddressSimple"/>
+        </actionGroup>
+        <!-- Checkout select Purchase Order payment -->
+        <actionGroup ref="CheckoutSelectPurchaseOrderPaymentActionGroup" stepKey="selectPurchaseOrderPayment">
+            <argument name="purchaseOrderNumber" value="12345"/>
+        </actionGroup>
+        <see selector="{{CheckoutPaymentSection.billingAddress}}" userInput="{{CustomerAddressSimple.street[0]}}" stepKey="assertBillingAddress"/>
+    </test>
+</tests>

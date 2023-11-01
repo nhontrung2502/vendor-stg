@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontValidateNoCompanyPurchaseOrdersTabActionGroup">
+        <annotations>
+            <description>Verifies that a user cannot see the Company Purchase Order tab on the storefront. Must be on the Purchase Orders list page.</description>
+        </annotations>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderGridTab('my')}}" stepKey="waitForMyPurchaseOrdersTab"/>
+        <dontSeeElementInDOM selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderGridTab('company')}}" stepKey="dontSeeCompanyPurchaseOrdersTab"/>
+    </actionGroup>
+</actionGroups>

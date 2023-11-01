@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontCheckoutPurchaseOrderPaymentMethodSection">
+        <element name="checkPaymentMethodByName" type="text" selector="//div[@id='checkout-payment-method-load']//div[contains(@class,'purchase-order-payment-method')]//label//span[contains(., '{{methodName}}')]" parameterized="true"/>
+        <element name="deferredPaymentMethodBanner" type="text" selector="//div[@id='checkout-payment-method-load']//div[contains(@class,'purchase-order-payment-method')]//div[contains(@class,'message')]/span[contains(text(),'{{message}}')]" parameterized="true"/>
+        <element name="placePurchaseOrderButton" type="button" selector=".payment-method._active button[title='Place Purchase Order']"/>
+    </section>
+</sections>

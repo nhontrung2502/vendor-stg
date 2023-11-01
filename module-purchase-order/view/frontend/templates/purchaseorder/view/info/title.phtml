@@ -1,0 +1,24 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Info\Title $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="purchase-order-information">
+    <div class="purchase-order-date">
+        <b><?= $escaper->escapeHtml(__('Created:')) ?> </b>
+        <date>
+            <?= $escaper->escapeHtml(
+                $block->formatDate($block->getPurchaseOrder()->getCreatedAt(), \IntlDateFormatter::LONG)
+            ) ?>
+        </date>
+        <?php if ($block->getCreatorName()): ?>
+            (<?= $escaper->escapeHtml($block->getCreatorName()) ?>)
+        <?php endif; ?>
+    </div>
+</div>

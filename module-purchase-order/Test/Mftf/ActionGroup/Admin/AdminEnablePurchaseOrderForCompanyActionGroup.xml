@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminEnablePurchaseOrderForCompanyActionGroup">
+        <annotations>
+            <description>Enable Purchase Orders At Company Level. Must be on the Edit Company page</description>
+        </annotations>
+        <waitForElementVisible selector="{{AdminCompanyEditSection.advancedSettings}}" stepKey="waitForAdvancedSettings"/>
+        <conditionalClick selector="{{AdminCompanyEditSection.advancedSettings}}" dependentSelector="{{AdminCompanyEditSection.advancedSettings}}.show" visible="false" stepKey="expandAdvancedSettingsAccordion"/>
+        <waitForElementVisible selector="{{AdminCompanyEditSection.purchaseOrderSwitch}}" stepKey="waitForPurchaseOrdersToggle"/>
+        <checkOption selector="{{AdminCompanyEditSection.purchaseOrderSwitch}}" stepKey="enablePurchaseOrdersForCompany"/>
+    </actionGroup>
+</actionGroups>

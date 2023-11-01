@@ -1,0 +1,49 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Comments $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="block block-comments" data-mage-init='{"Magento_PurchaseOrder/js/purchaseorder/comment": {}}'>
+    <div class="block-title">
+        <strong><?= $escaper->escapeHtml(__(' Comment')) ?></strong>
+    </div>
+    <div class="block-content">
+        <div class="comments-field field-row" data-role="attach-wrapper">
+            <form class="comments-field field-row"
+                  action="<?= $escaper->escapeUrl($block->getUrl('purchaseorder/purchaseorder/addComment')) ?>"
+                  method="post"
+                  id="comments-form">
+                <input type="hidden" name="request_id" value="<?= $escaper->escapeHtmlAttr($block->getRequestId()) ?>"/>
+                <?= $block->getBlockHtml('formkey') ?>
+                <fieldset class="fieldset comments-info">
+                    <div class="field comments">
+                        <label class="label"><?= $escaper->escapeHtml(__('Add your comment')) ?></label>
+                        <div class="comments-field-control">
+                            <textarea name="comment"
+                                      data-comment-input
+                                      class="purchase_order-control-textarea"
+                                      rows="3"
+                                      cols="5"
+                                      id="purchase_order_comment"></textarea>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="actions-toolbar">
+                    <button type="submit"
+                            data-comment-submit
+                            title="<?= $escaper->escapeHtml(__('Add Comment')) ?>"
+                            class="action secondary send"
+                            data-mobile-label="<?= $escaper->escapeHtml(__('Add Comment')) ?>">
+                        <span><?= $escaper->escapeHtml(__('Add Comment')) ?></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

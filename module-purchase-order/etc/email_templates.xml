@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="sales_email_purchase_order_notification_purchase_order_approval_request" label="Purchase Order requires Approval"
+              file="purchase_order_approval_request.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_approval_required" label="Created and requires Approval Purchase Order"
+              file="purchase_order_approval_required.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_approval_required_payment_details" label="Created and requires payment details after Approval"
+              file="purchase_order_approval_required_payment_details.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_auto_approved" label="Created and Auto-approved Purchase Order"
+              file="purchase_order_auto_approved.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_auto_approved_payment_details" label="Created and automatically approved, requires payment details"
+              file="purchase_order_auto_approved_payment_details.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_approved" label="Approved Purchase Order"
+              file="purchase_order_approved.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_approved_payment_details" label="Approved, requires payment"
+              file="purchase_order_approved_payment_details.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_rejected" label="Rejected Purchase Order"
+              file="purchase_order_rejected.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_comment_added" label="Comment added to Purchase Order"
+              file="purchase_order_comment_added.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+    <template id="sales_email_purchase_order_notification_purchase_order_order_place_failed" label="Error creating Order from Purchase Order"
+              file="purchase_order_order_place_failed.html" type="html" module="Magento_PurchaseOrder" area="frontend"/>
+</config>

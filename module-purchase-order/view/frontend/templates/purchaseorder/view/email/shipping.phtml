@@ -1,0 +1,52 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Info\Shipping $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+// Get Purchase Order id from email template
+$purchaseOrderId = $block->getPurchaseOrderId();
+$block->setPurchaseOrderById($purchaseOrderId);
+$quote = $block->getQuote();
+?>
+<table class="order-details">
+    <tr>
+        <td class="address-details">
+            <h3><?= $escaper->escapeHtml(__('Billing Info')) ?></h3>
+            <p><?= $block->getBillingAddressHtml() ?></p>
+        </td>
+        <?php if (!$quote->getIsVirtual()): ?>
+        <td class="address-details">
+            <h3><?= $escaper->escapeHtml(__('Shipping Info')) ?></h3>
+            <p><?= $block->getShippingAddressHtml() ?></p>
+        </td>
+        <?php endif; ?>
+    </tr>
+    <tr>
+        <td class="method-info">
+            <h3><?= $escaper->escapeHtml(__('Payment Method')) ?></h3>
+            <?php if ($method = $quote->getPayment()->getMethodInstance()): ?>
+                <?= $escaper->escapeHtml($method->getTitle()) ?>
+            <?php else: ?>
+                <?= $escaper->escapeHtml(__('No payment information available')) ?>
+            <?php endif; ?>
+        </td>
+        <?php if (!$quote->getIsVirtual()): ?>
+        <td class="method-info">
+            <h3><?= $escaper->escapeHtml(__('Shipping Method')) ?></h3>
+            <p>
+            <?php if ($quote->getShippingAddress()->getShippingDescription()): ?>
+                <?= $escaper->escapeHtml($quote->getShippingAddress()->getShippingDescription()) ?>
+            <?php else: ?>
+                <?= $escaper->escapeHtml(__('No shipping information available')) ?>
+            <?php endif; ?>
+            </p>
+        </td>
+        <?php endif; ?>
+    </tr>
+</table>

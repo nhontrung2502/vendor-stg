@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Company::index">
+                <resource id="Magento_PurchaseOrder::all" title="Order Approvals" translate="title" sortOrder="20">
+                    <resource id="Magento_PurchaseOrder::view_purchase_orders"
+                              title="View my Purchase Orders" translate="title" sortOrder="10">
+                        <resource id="Magento_PurchaseOrder::view_purchase_orders_for_subordinates"
+                                  title="View for subordinates" translate="title" sortOrder="10"/>
+                        <resource id="Magento_PurchaseOrder::view_purchase_orders_for_company"
+                                  title="View for all company" translate="title" sortOrder="20"/>
+                    </resource>
+                    <resource id="Magento_PurchaseOrder::autoapprove_purchase_order"
+                              title="Auto-approve POs created within this role" translate="title" sortOrder="40">
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

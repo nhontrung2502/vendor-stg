@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="PurchaseOrderEnableDisableE2ETest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Store Configuration"/>
+            <title value="Purchase Order: Enable/Disable"/>
+            <description value="Purchase Order Creation should be enabled/disabled in frontend based on respective setting(s) in admin"/>
+            <severity value="BLOCKER"/>
+            <useCaseId value="B2B-359"/>
+            <testCaseId value="MC-31552"/>
+            <group value="purchase_orders"/>
+        </annotations>
+
+        <before>
+            <magentoCLI command="config:set {{DisablePurchaseOrderConfigurationData.path}} {{DisablePurchaseOrderConfigurationData.value}}" stepKey="disablePurchaseOrder"/>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="LoginAsAdmin"/>
+
+            <createData entity="Simple_US_Customer_CA" stepKey="createCompanyAdmin"/>
+            <!-- Create company and assign customer to it -->
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+
+            <!-- Create product in default website -->
+            <createData entity="defaultSimpleProduct" stepKey="createProduct"/>
+
+            <createData entity="NewRootCategory" stepKey="newRootCategory"/>
+            <createData entity="defaultSimpleProduct" stepKey="createProductCustomWebsite">
+                <requiredEntity createDataKey="newRootCategory"/>
+            </createData>
+
+            <!-- Create website -->
+            <actionGroup ref="AdminCreateWebsiteActionGroup" stepKey="createWebsite">
+                <argument name="newWebsiteName" value="{{customWebsite.name}}"/>
+                <argument name="websiteCode" value="{{customWebsite.code}}"/>
+            </actionGroup>
+
+            <!-- Get website ID for applying to company user creation later -->
+            <actionGroup ref="AdminGetWebsiteIdActionGroup" stepKey="getCustomWebsiteId">
+                <argument name="website" value="customWebsite"/>
+            </actionGroup>
+
+            <!-- Create second store -->
+            <actionGroup ref="CreateCustomStoreActionGroup" stepKey="createStore">
+                <argument name="website" value="{{customWebsite.name}}"/>
+                <argument name="store" value="{{customStoreGroup.name}}"/>
+                <argument name="rootCategory" value="$$newRootCategory.name$$"/>
+            </actionGroup>
+
+            <!-- Create second store view -->
+            <actionGroup ref="AdminCreateStoreViewActionGroup" stepKey="createStoreView">
+                <argument name="StoreGroup" value="customStoreGroup"/>
+                <argument name="customStore" value="customStoreEN"/>
+            </actionGroup>
+            <magentoCron groups="index" stepKey="reindex"/>
+
+            <!-- Create a company user assigned to custom website (to be assigned to company later via UI) -->
+            <createData entity="Simple_US_Customer" stepKey="createCompanyUser">
+                <field key="website_id">$grabFromCurrentUrlGetCustomWebsiteId</field>
+            </createData>
+
+            <magentoCLI command="config:set {{StorefrontEnableAddStoreCodeToUrls.path}} {{StorefrontEnableAddStoreCodeToUrls.value}}" stepKey="enableAddStoreCodeToUrls"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set {{EnablePurchaseOrderConfigurationData.path}} {{EnablePurchaseOrderConfigurationData.value}}" stepKey="enablePurchaseOrders"/>
+            <magentoCLI command="config:set {{StorefrontDisableAddStoreCodeToUrls.path}} {{StorefrontDisableAddStoreCodeToUrls.value}}" stepKey="disableAddStoreCodeToUrls"/>
+
+            <actionGroup ref="DeleteCustomWebsiteActionGroup" stepKey="deleteStore1">
+                <argument name="websiteName" value="customWebsite.name"/>
+            </actionGroup>
+            <magentoCron groups="index" stepKey="reindex"/>
+
+            <deleteData createDataKey="createCompanyUser" stepKey="deleteCompanyUser"/>
+            <deleteData createDataKey="createCompany" stepKey="deleteCompany"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteCompanyAdmin"/>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createProductCustomWebsite" stepKey="deleteProductCustomWebsite"/>
+            <deleteData createDataKey="newRootCategory" stepKey="deleteCategory"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <!-- 1.Assign Company User (subordinate) in Second Website to Created Company -->
+        <amOnPage url="{{AdminEditCustomerPage.url($$createCompanyUser.id$$)}}" stepKey="goToCustomerEditPage"/>
+        <actionGroup ref="AdminAddACompanyToCustomerActionGroup" stepKey="associateCustomerWithCompany">
+            <argument name="companyName" value="$$createCompany.company_name$$"/>
+        </actionGroup>
+
+        <!-- 2.Assign Second Product to Second (Custom) Website -->
+        <actionGroup ref="FilterAndSelectProductActionGroup" stepKey="openAdminProductPage">
+            <argument name="productSku" value="$$createProductCustomWebsite.sku$$"/>
+        </actionGroup>
+        <actionGroup ref="AdminAssignProductInWebsiteActionGroup" stepKey="selectProductInWebsites">
+            <argument name="website" value="{{customWebsite.name}}"/>
+        </actionGroup>
+        <actionGroup ref="SaveProductFormActionGroup" stepKey="clickSaveButton"/>
+
+        <!-- 3.Login as Company Admin into Default Website -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginToStorefrontAsCompanyAdmin">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+
+        <!-- 4.Open Product Page in Default Website -->
+        <actionGroup ref="StorefrontOpenProductPageActionGroup" stepKey="openStorefrontProductPage2">
+            <argument name="productUrl" value="$$createProduct.custom_attributes[url_key]$$"/>
+        </actionGroup>
+
+        <!-- 5.Add Product to Cart as Company Admin in Default Website; cannot use StorefrontAddProductToCartActionGroup because it asserts presence of checkout url without the prepended store code segment ('default' will be prepended) -->
+        <click selector="{{StorefrontProductInfoMainSection.AddToCart}}" stepKey="clickAddToCart2"/>
+        <waitForElementVisible selector="{{StorefrontCategoryMainSection.SuccessMsg}}" stepKey="waitForSuccessMessage2"/>
+        <see selector="{{StorefrontProductPageSection.messagesBlock}}" userInput="You added $$createProduct.name$$ to your shopping cart." stepKey="assertSuccessMessage2"/>
+        <see selector="{{StorefrontMinicartSection.quantity}}" userInput="1" stepKey="seeCartQuantity2"/>
+
+        <!-- 6.Go to last step of checkout for Default Website Product as Company Admin -->
+        <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckout"/>
+        <actionGroup ref="CheckoutSelectFlatRateShippingMethodActionGroup" stepKey="selectFlatRateShippingMethod"/>
+        <comment userInput="BIC workaround" stepKey="waitForNextButtonToAppear"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton"/>
+        <!-- Assert button reads "Place Order" and NOT "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Order" stepKey="seePlaceOrderButton"/>
+
+        <!-- 7.Enable Purchase Orders in default scope config in Admin -->
+        <actionGroup ref="AdminEnablePurchaseOrdersForStoreActionGroup" stepKey="enablePurchaseOrdersInDefaultScopeConfig"/>
+
+        <!-- 8.Go to last step of checkout for Default Website Product as Company Admin -->
+        <amOnPage url="/default/checkout" stepKey="goToCheckoutPage2"/>
+        <waitForPageLoad stepKey="waitForCheckOutPageToLoad2"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext2"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment2"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton2"/>
+        <!-- Assert button still reads "Place Order" and NOT "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Order" stepKey="seePlaceOrderButton2"/>
+
+        <!-- 9.Enable Purchase Order for company in admin -->
+        <amOnPage url="{{AdminCompanyEditPage.url($$createCompany.id$$)}}" stepKey="amOnCompanyEditPageInAdmin"/>
+        <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrdersAtCompanyLevel"/>
+        <actionGroup ref="AdminCompanySaveActionGroup" stepKey="saveCompany"/>
+
+        <!-- 10.Go to last step of checkout for Default Website Product as Company Admin -->
+        <amOnPage url="/default/checkout" stepKey="goToCheckoutPage3"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext3"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment3"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton3"/>
+        <!-- Assert button now reads "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Purchase Order" stepKey="seePlaceOrderButton3"/>
+
+        <!-- 11.Disable Purchase Orders in default scope config in Admin -->
+        <actionGroup ref="AdminDisablePurchaseOrderForStoreActionGroup" stepKey="disablePurchaseOrdersInDefaultScopeConfig"/>
+
+        <!-- 12.Go to last step of checkout for Default Website Product as Company Admin -->
+        <amOnPage url="/default/checkout" stepKey="goToCheckoutPage4"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext4"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment4"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton4"/>
+        <!-- Assert button reads "Place Order" and NOT "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Order" stepKey="seePlaceOrderButton4"/>
+
+        <!-- 13.Logout of Company Admin -->
+        <amOnPage url="{{StorefrontCustomerLogoutPage.url}}" stepKey="storefrontSignOut2"/>
+        <waitForPageLoad stepKey="waitForSignOut2"/>
+
+        <!-- 14.Login as Company User into Second (Custom) Website -->
+        <amOnPage url="/{{customStoreEN.code}}/customer/account/login" stepKey="amOnSignInPage2"/>
+        <waitForPageLoad stepKey="waitPageFullyLoaded2"/>
+        <waitForElementVisible selector="{{StorefrontCustomerSignInFormSection.emailField}}" stepKey="waitForFormToAppear2"/>
+        <fillField userInput="$$createCompanyUser.email$$" selector="{{StorefrontCustomerSignInFormSection.emailField}}" stepKey="fillEmail2"/>
+        <fillField userInput="$$createCompanyUser.password$$" selector="{{StorefrontCustomerSignInFormSection.passwordField}}" stepKey="fillPassword2"/>
+        <click selector="{{StorefrontCustomerSignInFormSection.signInAccountButton}}" stepKey="clickSignInAccountButton2"/>
+        <waitForPageLoad stepKey="waitForCustomerLoggedIn2"/>
+
+        <!-- 15.Open Product Page in Second (Custom) Website -->
+        <actionGroup ref="StorefrontOpenProductPageOnSecondStoreActionGroup" stepKey="openStorefrontProductPage">
+            <argument name="storeCode" value="{{customStoreEN.code}}"/>
+            <argument name="productUrl" value="$createProductCustomWebsite.name$"/>
+        </actionGroup>
+
+        <!-- 16.Add Product to Cart; cannot use StorefrontAddProductToCartActionGroup because it asserts presence of checkout url without the prepended store code segment -->
+        <click selector="{{StorefrontProductInfoMainSection.AddToCart}}" stepKey="clickAddToCart"/>
+        <waitForElementVisible selector="{{StorefrontCategoryMainSection.SuccessMsg}}" stepKey="waitForSuccessMessage"/>
+        <see selector="{{StorefrontProductPageSection.messagesBlock}}" userInput="You added $$createProductCustomWebsite.name$$ to your shopping cart." stepKey="assertSuccessMessage"/>
+        <see selector="{{StorefrontMinicartSection.quantity}}" userInput="1" stepKey="seeCartQuantity"/>
+
+        <!-- 17.Go to last step of checkout for Second (Custom) Website Product as Company User -->
+        <amOnPage url="/{{customStoreEN.code}}/checkout" stepKey="goToCheckout5"/>
+        <actionGroup ref="CheckoutSelectFlatRateShippingMethodActionGroup" stepKey="selectFlatRateShippingMethod5"/>
+        <comment userInput="BIC workaround" stepKey="waitForNextButtonToAppear5"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext5"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment5"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton5"/>
+        <!-- Assert button reads "Place Order" and NOT "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Order" stepKey="seePlaceOrderButton5"/>
+
+        <!-- 18.Enable Purchase Orders in default scope config in Admin -->
+        <actionGroup ref="AdminEnablePurchaseOrdersForStoreActionGroup" stepKey="enablePurchaseOrdersInDefaultScopeConfig1"/>
+
+        <!-- 19.Go to last step of checkout for Second (Custom) Website Product as Company User -->
+        <amOnPage url="/{{customStoreEN.code}}/checkout" stepKey="goToCheckout6"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext6"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment6"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton6"/>
+        <!-- Assert button now reads "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Purchase Order" stepKey="seePlaceOrderButton6"/>
+
+        <!-- 20.Disable Purchase Orders in website scope config in Admin -->
+        <amOnPage url="{{AdminB2BConfigPage.url}}" stepKey="goToAdminB2BConfigPage44"/>
+        <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchStoreView">
+            <argument name="storeView" value="customStoreEN.name"/>
+        </actionGroup>
+        <actionGroup ref="AdminDisablePurchaseOrderForStoreActionGroup" stepKey="disablePurchaseOrdersInDefaultScopeConfig1"/>
+
+        <!-- 21.Go to last step of checkout for Second (Custom) Website Product as Company User -->
+        <amOnPage url="/{{customStoreEN.code}}/checkout" stepKey="goToCheckout7"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext7"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment7"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton7"/>
+        <!-- Assert button reads "Place Order" and NOT "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Order" stepKey="seePlaceOrderButton7"/>
+
+        <!-- 22.Disable Purchase Orders in default scope config in Admin -->
+        <actionGroup ref="AdminDisablePurchaseOrderForStoreActionGroup" stepKey="disablePurchaseOrdersInDefaultScopeConfig3"/>
+
+        <!-- 23.Enable Purchase Orders in website scope config in Admin -->
+        <amOnPage url="{{AdminB2BConfigPage.url}}" stepKey="goToAdminB2BConfigPage7"/>
+        <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchStoreView2">
+            <argument name="storeView" value="customStoreEN.name"/>
+        </actionGroup>
+        <actionGroup ref="AdminEnablePurchaseOrdersForStoreActionGroup" stepKey="enablePurchaseOrdersInDefaultScopeConfig2"/>
+
+        <!-- 24.Go to last step of checkout for Second (Custom) Website Product as Company User -->
+        <amOnPage url="/{{customStoreEN.code}}/checkout" stepKey="goToCheckout8"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNext8"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="clickCheckMoneyOrderPayment8"/>
+        <waitForElement selector="{{CheckoutPaymentSection.placeOrder}}" time="30" stepKey="waitForPlaceOrderButton8"/>
+        <!-- Assert button reads "Place Purchase Order" -->
+        <see selector="{{CheckoutPaymentSection.placeOrder}}" userInput="Place Purchase Order" stepKey="seePlaceOrderButton8"/>
+    </test>
+</tests>

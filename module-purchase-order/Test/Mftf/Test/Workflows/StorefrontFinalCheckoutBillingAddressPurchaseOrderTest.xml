@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontFinalCheckoutBillingAddressPurchaseOrderTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Edit Billing Address on Purchase Order Final Checkout Page"/>
+            <description value="Verify that a buyer can edit billing address on purchase order final checkout page.
+            Verify that changing the address does not affect any of the prices"/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="B2B-964"/>
+            <group value="purchase_orders"/>
+        </annotations>
+
+        <before>
+            <!-- Tax Calculation Based On Billing, Disable Address Search & Set Search Limit to 10 -->
+            <magentoCLI command="config:set tax/calculation/based_on billing" stepKey="setTaxCalculationBasedOnBilling"/>
+            <magentoCLI command="config:set checkout/options/enable_address_search 0" stepKey="disableAddressSearch"/>
+            <magentoCLI command="config:set checkout/options/customer_address_limit 10" stepKey="setSearchAddressLimit"/>
+
+            <!-- Enable PayPal Express Checkout, Enable Tax to Display on Storefront -->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminPayPalExpressCheckoutEnableActionGroup" stepKey="configPaypalExpressCheckout" />
+            <actionGroup ref="EditTaxConfigurationByUIActionGroup" stepKey="fillDefaultTaxForms"/>
+
+            <!-- Create Tax Rule w/ NY & CA Tax Rates -->
+            <actionGroup ref="AdminGoToNewTaxRulePageActionGroup" stepKey="goToCreateTaxRulePage"/>
+            <fillField selector="{{AdminTaxRulesSection.ruleName}}" userInput="{{SimpleTaxRule.code}}" stepKey="fillRuleName"/>
+            <actionGroup ref="AddNewTaxRateNoZipActionGroup" stepKey="addNYTaxRate">
+                <argument name="taxCode" value="SimpleTaxNY"/>
+            </actionGroup>
+            <actionGroup ref="AddNewTaxRateNoZipActionGroup" stepKey="addCATaxRate">
+                <argument name="taxCode" value="SimpleTaxCA"/>
+            </actionGroup>
+            <actionGroup ref="AdminSaveTaxRuleActionGroup" stepKey="saveTaxRule"/>
+
+            <!-- Create Company Admin, 1 Customer, & 1 Product -->
+            <createData entity="CompanyAdminUser" stepKey="createCompanyAdmin"/>
+            <createData entity="CompanyRegularPurchaser" stepKey="createPurchaseOrderCreatorCustomer"/>
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="SimpleSubCategory" stepKey="category"/>
+            <createData entity="SimpleProductForPurchaseOrder_Price_987_65" stepKey="product1">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+
+            <!-- Enable Company Order Approvals -->
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createCompany.id$"/>
+                <argument name="companyName" value="$createCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrderForCompany"/>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="SaveCompany"/>
+
+            <!-- Assign Purchase Order Creator Customer to Company -->
+            <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerEditPagePurchaser">
+                <argument name="customerId" value="$$createPurchaseOrderCreatorCustomer.id$"/>
+            </actionGroup>
+            <actionGroup ref="AdminAddACompanyToCustomerActionGroup" stepKey="assignPurchaserCustomerToCompany">
+                <argument name="companyName" value="$$createCompany.company_name$$"/>
+            </actionGroup>
+
+            <!-- Enable View Purchase Orders Permission for Default Role -->
+            <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+                <argument name="Customer" value="$$createCompanyAdmin$$"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontNavigateToRolesAndPermissionsPageActionGroup" stepKey="navigateToRolesAndPermissionsPage"/>
+            <actionGroup ref="StorefrontClickEditForRoleInRolesGridActionGroup" stepKey="clickEditForRoleInRolesGrid">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableViewPurchaseOrdersPermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::view_purchase_orders"/>
+            </actionGroup>
+
+            <!-- Enable Auto-Approve Purchase Orders Permission for Default Role -->
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableAutoApprovePermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::autoapprove_purchase_order"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontSaveCompanyRoleActionGroup" stepKey="saveCompanyRole">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCompanyAdmin"/>
+        </before>
+
+        <after>
+            <!-- Revert Configurations & Delete Data -->
+            <magentoCLI command="config:set tax/calculation/based_on shipping" stepKey="setTaxCalculationBasedOnShipping"/>
+            <magentoCLI command="config:set checkout/options/enable_address_search 0" stepKey="disableAddressSearch"/>
+            <magentoCLI command="config:set checkout/options/customer_address_limit 10" stepKey="setSearchAddressLimit"/>
+            <actionGroup ref="AdminPayPalExpressCheckoutDisableActionGroup" stepKey="configPaypalExpressCheckoutDisable" />
+            <actionGroup ref="ChangeToDefaultTaxConfigurationUIActionGroup" stepKey="changeToDefaultTaxConfiguration"/>
+            <actionGroup ref="AdminTaxRuleGridOpenPageActionGroup" stepKey="goToTaxRulesPage"/>
+            <actionGroup ref="deleteEntitySecondaryGrid" stepKey="deleteRule">
+                <argument name="name" value="{{SimpleTaxRule.code}}"/>
+                <argument name="searchInput" value="{{AdminSecondaryGridSection.taxIdentifierSearch}}"/>
+            </actionGroup>
+            <actionGroup ref="AdminTaxRateGridOpenPageActionGroup" stepKey="goToTaxRatesPage"/>
+            <actionGroup ref="deleteEntitySecondaryGrid" stepKey="deleteNYRate">
+                <argument name="name" value="{{SimpleTaxNY.state}}-{{SimpleTaxNY.rate}}"/>
+                <argument name="searchInput" value="{{AdminSecondaryGridSection.taxIdentifierSearch}}"/>
+            </actionGroup>
+            <actionGroup ref="deleteEntitySecondaryGrid" stepKey="deleteCARate">
+                <argument name="name" value="{{SimpleTaxCA.state}}-{{SimpleTaxCA.rate}}"/>
+                <argument name="searchInput" value="{{AdminSecondaryGridSection.taxIdentifierSearch}}"/>
+            </actionGroup>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="adminLogout"/>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="storefrontLogout"/>
+            <deleteData createDataKey="createPurchaseOrderCreatorCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createCompany" stepKey="deleteCompany"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteAdminCustomer"/>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <deleteData createDataKey="product1" stepKey="deleteProduct1"/>
+        </after>
+
+        <!-- Create Purchase Order -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser">
+            <argument name="Customer" value="$$createPurchaseOrderCreatorCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep"/>
+        <actionGroup ref="StorefrontPurchaseOrderCheckoutSelectPayPalExpressActionGroup" stepKey="selectPayPalExpress" />
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderId"/>
+
+        <!-- Assert PO is in 'Approved - Pending Payment' status -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovalRequired">
+            <argument name="status" value="{{PurchaseOrderStatuses.approvedPendingPayment}}"/>
+        </actionGroup>
+
+        <!-- Go to Purchase Order Final Checkout Page & Verify Order Summary -->
+        <actionGroup ref="StorefrontClickPlaceOrderLinkInBannerActionGroup" stepKey="clickPlaceOrderBannerLink"/>
+        <waitForText selector="{{CheckoutPaymentSection.orderSummarySubtotal}}" userInput="$987.65" stepKey="seeCorrectSubtotal1"/>
+        <waitForText selector="{{CheckoutPaymentSection.tax}}" userInput="$82.72" stepKey="seeCorrectOrderTax1"/>
+        <waitForText selector="{{CheckoutPaymentSection.orderSummaryTotalIncluding}}" userInput="$1,075.37" stepKey="seeCorrectOrderTotalIncludingTax1"/>
+        <waitForText selector="{{CheckoutPaymentSection.orderSummaryTotalExcluding}}" userInput="$992.65" stepKey="seeCorrectOrderTotalExcludingTax1"/>
+
+        <!-- Change Billing Address in Address Search -->
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMoneyOrderPayment" />
+        <uncheckOption selector="{{CheckoutPaymentSection.billingAddressNotSameCheckbox}}" stepKey="uncheckBillingAddressSameAsShipping"/>
+        <actionGroup ref="StorefrontSelectAddressInCheckoutAddressDropDownActionGroup" stepKey="selectNewAddress"/>
+        <actionGroup ref="LoggedInCheckoutFillNewBillingAddressActionGroup" stepKey="changeBillingAddress">
+            <argument name="Address" value="US_Address_CA"/>
+            <argument name="classPrefix" value="[aria-hidden=false]"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontClickUpdateAddressInCheckoutActionGroup" stepKey="saveAddress"/>
+
+        <!-- Verify Order Summary Does Not Change -->
+        <waitForText selector="{{CheckoutPaymentSection.orderSummarySubtotal}}" userInput="$987.65" stepKey="seeCorrectSubtotal2"/>
+        <waitForText selector="{{CheckoutPaymentSection.tax}}" userInput="$82.72" stepKey="seeCorrectOrderTax2"/>
+        <waitForText selector="{{CheckoutPaymentSection.orderSummaryTotalIncluding}}" userInput="$1,075.37" stepKey="seeCorrectOrderTotalIncludingTax2"/>
+        <waitForText selector="{{CheckoutPaymentSection.orderSummaryTotalExcluding}}" userInput="$992.65" stepKey="seeCorrectOrderTotalExcludingTax2"/>
+
+        <!-- Enable Address Search & Reload Page -->
+        <magentoCLI command="config:set checkout/options/enable_address_search 1" stepKey="enableAddressSearch"/>
+        <magentoCLI command="config:set checkout/options/customer_address_limit 1" stepKey="setSearchAddressLimit"/>
+        <reloadPage stepKey="reloadPage"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+
+        <!-- Change Billing Address in Address Selection -->
+        <actionGroup ref="StorefrontOpenCustomerAddressesOnPaymentStepInCheckoutActionGroup" stepKey="openCustomerBillingAddressPopup" />
+        <actionGroup ref="StorefrontSelectCustomerAddressOnPaymentStepInCheckoutActionGroup" stepKey="selectAddress">
+            <argument name="address" value="{{US_Address_NY_Default_Shipping.postcode}}"/>
+        </actionGroup>
+
+        <!-- Verify Order Summary Does Not Change -->
+        <waitForText selector="{{CheckoutPaymentSection.orderSummarySubtotal}}" userInput="$987.65" stepKey="seeCorrectSubtotal3"/>
+        <waitForText selector="{{CheckoutPaymentSection.tax}}" userInput="$82.72" stepKey="seeCorrectOrderTax3"/>
+        <waitForText selector="{{CheckoutPaymentSection.orderSummaryTotalIncluding}}" userInput="$1,075.37" stepKey="seeCorrectOrderTotalIncludingTax3"/>
+        <waitForText selector="{{CheckoutPaymentSection.orderSummaryTotalExcluding}}" userInput="$992.65" stepKey="seeCorrectOrderTotalExcludingTax3"/>
+
+        <!-- Place Order & Verify Order Totals -->
+        <actionGroup ref="ClickPlaceOrderActionGroup" stepKey="placeOrder"/>
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderLink}}" stepKey="grabOrderNumber"/>
+        <actionGroup ref="StorefrontOpenOrderFromSuccessPageActionGroup" stepKey="navigateToOrderPage">
+            <argument name="orderNumber" value="$grabOrderNumber"/>
+        </actionGroup>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.subtotal}}" userInput="$987.65" stepKey="verifyOrderSummarySubtotal"/>
+        <waitForText selector="{{StorefrontOrderDetailsSection.tax}}" userInput="$82.72" stepKey="verifyOrderSummaryTax"/>
+        <waitForText selector="{{StorefrontOrderDetailsSection.grandTotalPrice}}" userInput="$992.65" stepKey="verifyOrderSummaryGrandTotalExcludingTax"/>
+        <waitForText selector="{{StorefrontOrderDetailsSection.grandTotalIncludingTax}}" userInput="$1,075.37" stepKey="verifyOrderSummaryGrandTotalIncludingTax"/>
+    </test>
+</tests>

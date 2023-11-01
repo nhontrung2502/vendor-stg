@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontCreateNegotiableQuoteWithNegotiatedShippingPriceTest">
+        <annotations>
+            <features value="NegotiableQuote"/>
+            <stories value="Negotiable Quotes"/>
+            <title value="All shipping methods must be available after enabling Negotiable Quotes."/>
+            <description value="All shipping methods must be available after enabling Negotiable Quotes."/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-25822"/>
+            <group value="negotiable_quotes"/>
+        </annotations>
+        <before>
+            <createData entity="SimpleProduct2" stepKey="createSimpleProduct"/>
+            <createData entity="Simple_US_Customer" stepKey="createCompanyAdmin"/>
+            <createData entity="Default_Company" stepKey="createDefaultCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <magentoCLI command="config:set {{EnableCompanyConfigData.path}} {{EnableCompanyConfigData.value}}" stepKey="enableCompany"/>
+            <magentoCLI command="config:set {{EnableB2BQuoteConfigData.path}} {{EnableB2BQuoteConfigData.value}}" stepKey="enableNegotiableQuote"/>
+            <magentoCLI command="config:set {{EnableFlatRateConfigData.path}} {{EnableFlatRateConfigData.value}}" stepKey="enableFlatRate"/>
+            <magentoCLI command="config:set {{AdminFreeshippingActiveConfigData.path}} {{AdminFreeshippingActiveConfigData.enabled}}" stepKey="enableFreeShippingMethod" />
+        </before>
+        <after>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutStorefront"/>
+            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createDefaultCompany" stepKey="deleteCompany" />
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteCustomer"/>
+
+            <magentoCLI command="config:set {{DisableCompanyConfigData.path}} {{DisableCompanyConfigData.value}}" stepKey="disableCompany"/>
+            <magentoCLI command="config:set {{DisableB2BQuoteConfigData.path}} {{DisableB2BQuoteConfigData.value}}" stepKey="disableNegotiableQuote"/>
+            <magentoCLI command="config:set {{AdminFreeshippingActiveConfigData.path}} {{AdminFreeshippingActiveConfigData.disabled}}" stepKey="disableFreeShippingMethod" />
+            <comment userInput="BIC workaround" stepKey="logoutCustomerFromStorefront"/>
+        </after>
+
+        <!--Login as company admin-->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="customerLogin">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+
+        <!-- Add simple product to cart -->
+        <actionGroup ref="AddSimpleProductToCartActionGroup" stepKey="addProductToCart">
+            <argument name="product" value="$$createSimpleProduct$$"/>
+        </actionGroup>
+
+        <!-- Navigate to checkout page -->
+        <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckoutFromMinicartActionGroup"/>
+
+        <!-- Select shipping method -->
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod">
+            <argument name="shippingMethodName" value=""/>
+        </actionGroup>
+
+        <actionGroup ref="StorefrontCheckoutForwardFromShippingStepActionGroup" stepKey="navigateToPaymentStep"/>
+        <!-- Go back to shipping method selection -->
+        <actionGroup ref="OpenStoreFrontCheckoutShippingPageActionGroup" stepKey="openStoreFrontCheckoutShippingPageActionGroup"/>
+
+        <!-- Check that available shipping methods are visible -->
+        <see userInput="Flat Rate" selector="{{CheckoutShippingMethodsSection.shippingMethodRow}}" stepKey="assertShippingMethodsFlatRateBeforeOrderPlaced"/>
+        <see userInput="Free Shipping" selector="{{CheckoutShippingMethodsSection.shippingMethodRow}}"  stepKey="assertShippingMethodsFreeBeforeOrderPlaced"/>
+
+        <actionGroup ref="StorefrontCheckoutForwardFromShippingStepActionGroup" stepKey="navigateToPaymentStepAfterShippingChecked"/>
+
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMoneyOrderPayment"/>
+        <actionGroup ref="CheckoutPlaceOrderActionGroup" stepKey="placeOrder">
+            <argument name="orderNumberMessage" value="CONST.successCheckoutOrderNumberMessage"/>
+            <argument name="emailYouMessage" value="CONST.successCheckoutEmailYouMessage"/>
+        </actionGroup>
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber22}}" stepKey="grabOrderNumber"/>
+
+        <!-- Make Reorder  -->
+        <actionGroup ref="StorefrontOpenOrderFromSuccessPageActionGroup" stepKey="openOrderFromSuccessPage">
+            <argument name="orderNumber" value="{$grabOrderNumber}"/>
+        </actionGroup>
+        <click selector="{{StorefrontCustomerOrderViewSection.reorder}}" stepKey="clickReorder"/>
+
+        <!-- Navigate to checkout page -->
+        <click selector="{{CheckoutCartSummarySection.proceedToCheckout}}" stepKey="navigateToCheckouPage"/>
+
+        <!-- Go back to shipping method selection -->
+        <actionGroup ref="OpenStoreFrontCheckoutShippingPageActionGroup" stepKey="openStoreFrontCheckoutShippingPageDuringReorder"/>
+
+        <!-- Check that available shipping methods are visible -->
+        <see userInput="Flat Rate" selector="{{CheckoutShippingMethodsSection.shippingMethodRow}}" stepKey="assertShippingMethodsFlatRate"/>
+        <see userInput="Free Shipping" selector="{{CheckoutShippingMethodsSection.shippingMethodRow}}" stepKey="assertShippingMethodsFree"/>
+    </test>
+</tests>

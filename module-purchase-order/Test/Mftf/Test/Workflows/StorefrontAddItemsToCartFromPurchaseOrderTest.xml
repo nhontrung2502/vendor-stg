@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontAddItemsToCartFromPurchaseOrderTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Add Items to Cart"/>
+            <title value="Add Items to Cart from Purchase Order Page"/>
+            <description value="Verify all items in a purchase order can be added to a shopping cart. Tests merging
+            with cart items and replacing cart items"/>
+            <severity value="CRITICAL"/>
+            <group value="purchase_orders"/>
+        </annotations>
+        <before>
+            <createData entity="CustomerEntityOne" stepKey="createCompanyAdmin"/>
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="SimpleSubCategory" stepKey="category"/>
+            <createData entity="SimpleProductForPurchaseOrder_Price_987_65" stepKey="product1">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+            <!-- Enable Company Order Approvals -->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createCompany.id$"/>
+                <argument name="companyName" value="$createCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrderForCompany"/>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="saveCompany"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCompany" stepKey="deleteCompany"/>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <deleteData createDataKey="product1" stepKey="deleteProduct1"/>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="storefrontCustomerLogout"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteAdminCustomer"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+        <!-- Create Purchase Order -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart"/>
+        <!-- Complete Checkout -->
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMoneyOrder"/>
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder"/>
+        <generateDate date="now" format="M j, Y, g:" stepKey="poSubmittedTime"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderId"/>
+        <!-- Go to Purchase Order Details Page -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink"/>
+        <!-- Add Item to Shopping Cart and Verify Cart -->
+        <actionGroup ref="StorefrontClickAddItemToShoppingCartActionGroup" stepKey="addItemToShoppingCart"/>
+        <actionGroup ref="StorefrontClickOnMiniCartActionGroup" stepKey="clickOnMiniCart"/>
+        <actionGroup ref="AssertStorefrontMiniCartItemsActionGroup" stepKey="assertSimpleProduct11MiniCart">
+            <argument name="productName" value="$$product1.name$$"/>
+            <argument name="productPrice" value="$987.65"/>
+            <argument name="cartSubtotal" value="$987.65" />
+            <argument name="qty" value="1"/>
+        </actionGroup>
+        <!-- Move Back To Purchase Order Page -->
+        <moveBack stepKey="moveBack"/>
+        <waitForPageLoad stepKey="waitForMoveBack"/>
+        <!-- Add Item to Shopping Cart and Click Cancel -->
+        <actionGroup ref="StorefrontClickAddItemToShoppingCartActionGroup" stepKey="addItemToShoppingCart3"/>
+        <actionGroup ref="StorefrontClickCancelOnAddItemToShoppingCartModalActionGroup" stepKey="clickCancelButton"/>
+        <actionGroup ref="StorefrontClickOnMiniCartActionGroup" stepKey="clickOnMiniCart1"/>
+        <actionGroup ref="AssertStorefrontMiniCartItemsActionGroup" stepKey="assertSimpleProduct11MiniCart1">
+            <argument name="productName" value="$$product1.name$$"/>
+            <argument name="productPrice" value="$987.65"/>
+            <argument name="cartSubtotal" value="$987.65" />
+            <argument name="qty" value="1"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontClickOnMiniCartActionGroup" stepKey="clickOnMiniCart2"/>
+        <!-- Add Item to Shopping Cart and Click Merge -->
+        <actionGroup ref="StorefrontClickAddItemToShoppingCartActionGroup" stepKey="addItemToShoppingCart1"/>
+        <actionGroup ref="StorefrontClickMergeOnAddItemToShoppingCartModalActionGroup" stepKey="clickMergeButton"/>
+        <actionGroup ref="StorefrontClickOnMiniCartActionGroup" stepKey="clickOnMiniCart3"/>
+        <actionGroup ref="AssertStorefrontMiniCartItemsActionGroup" stepKey="assertSimpleProduct11MiniCart2">
+            <argument name="productName" value="$$product1.name$$"/>
+            <argument name="productPrice" value="$987.65"/>
+            <argument name="cartSubtotal" value="$1,975.30" />
+            <argument name="qty" value="2"/>
+        </actionGroup>
+        <!-- Move Back To Purchase Order Page -->
+        <moveBack stepKey="moveBack1"/>
+        <waitForPageLoad stepKey="waitForMoveBack1"/>
+        <!-- Add Item to Shopping Cart and Click Replace -->
+        <actionGroup ref="StorefrontClickAddItemToShoppingCartActionGroup" stepKey="addItemToShoppingCart2"/>
+        <actionGroup ref="StorefrontClickReplaceOnAddItemToShoppingCartModalActionGroup" stepKey="clickReplaceButton"/>
+        <actionGroup ref="StorefrontClickOnMiniCartActionGroup" stepKey="clickOnMiniCart4"/>
+        <!-- Assert Replaced Product Details in Mini Cart -->
+        <actionGroup ref="AssertStorefrontMiniCartItemsActionGroup" stepKey="assertSimpleProduct11MiniCart3">
+            <argument name="productName" value="$$product1.name$$"/>
+            <argument name="productPrice" value="$987.65"/>
+            <argument name="cartSubtotal" value="$987.65" />
+            <argument name="qty" value="1"/>
+        </actionGroup>
+    </test>
+</tests>

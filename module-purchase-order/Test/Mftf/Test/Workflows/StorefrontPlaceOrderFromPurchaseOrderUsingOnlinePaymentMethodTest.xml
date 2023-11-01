@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontPlaceOrderFromPurchaseOrderUsingOnlinePaymentMethodTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Workflow"/>
+            <title value="Create Order from Purchase Order Using Online Payment Method"/>
+            <description value="Verify that a buyer can create a purchase order and place order using online payment method"/>
+            <severity value="BLOCKER"/>
+            <useCaseId value="B2B-964"/>
+            <group value="purchase_orders"/>
+        </annotations>
+
+        <before>
+            <!-- Enable PayPal Express Checkout-->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminPayPalExpressCheckoutEnableActionGroup" stepKey="ConfigPayPalExpressCheckout"/>
+            <actionGroup ref="CliCacheCleanActionGroup" stepKey="cleanFullPageCache">
+                <argument name="tags" value="config full_page"/>
+            </actionGroup>
+
+            <!-- Create Company Admin, 1 User, & 1 Product -->
+            <createData entity="CompanyAdminUser" stepKey="createCompanyAdmin"/>
+            <createData entity="CompanyRegularPurchaser" stepKey="createPurchaseOrderCreatorCustomer"/>
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="SimpleSubCategory" stepKey="category"/>
+            <createData entity="SimpleProductForPurchaseOrder_Price_987_65" stepKey="product1">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+
+            <!-- Create Gift Card Code Pool -->
+            <createData entity="GiftCardCodePool" stepKey="createCodePool"/>
+
+            <!-- Enable Company Order Approvals -->
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createCompany.id$"/>
+                <argument name="companyName" value="$createCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrderForCompany"/>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="SaveCompany"/>
+
+            <!-- Assign Purchase Order Creator Customer to Company -->
+            <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerEditPagePurchaser">
+                <argument name="customerId" value="$$createPurchaseOrderCreatorCustomer.id$"/>
+            </actionGroup>
+            <actionGroup ref="AdminAddACompanyToCustomerActionGroup" stepKey="assignPurchaserCustomerToCompany">
+                <argument name="companyName" value="$$createCompany.company_name$$"/>
+            </actionGroup>
+
+            <!-- Enable View Purchase Orders Permission for Default User Role -->
+            <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+                <argument name="Customer" value="$$createCompanyAdmin$$"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontNavigateToRolesAndPermissionsPageActionGroup" stepKey="navigateToRolesAndPermissionsPage"/>
+            <actionGroup ref="StorefrontClickEditForRoleInRolesGridActionGroup" stepKey="clickEditForRoleInRolesGrid">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableViewPurchaseOrdersPermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::view_purchase_orders"/>
+            </actionGroup>
+
+            <!-- Enable Auto-Approve Purchase Orders Permission for Default User Role -->
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableAutoApprovePermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::autoapprove_purchase_order"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontSaveCompanyRoleActionGroup" stepKey="saveCompanyRole">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCompanyAdmin"/>
+        </before>
+
+        <after>
+            <!-- Revert Configurations & Delete Data -->
+            <magentoCLI command="config:set {{StorefrontPaypalMerchantAccountIdConfigData.path}} {{StorefrontPaypalMerchantAccountIdConfigData.value}}" stepKey="deleteMerchantId"/>
+            <magentoCLI command="config:set {{StorefrontPaypalDisableInContextCheckoutConfigData.path}} {{StorefrontPaypalDisableInContextCheckoutConfigData.value}}" stepKey="disableInContextPayPal"/>
+            <magentoCLI command="config:set {{StorefrontPaypalDisableConfigData.path}} {{StorefrontPaypalDisableConfigData.value}}" stepKey="disablePayPal"/>
+            <createData entity="SamplePaypalConfig" stepKey="setDefaultPayPalConfig"/>
+            <actionGroup ref="CliCacheCleanActionGroup" stepKey="cleanFullPageCache">
+                <argument name="tags" value="config full_page"/>
+            </actionGroup>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <deleteData createDataKey="product1" stepKey="deleteProduct1"/>
+            <deleteData createDataKey="createCompany" stepKey="deleteCompany"/>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="storefrontLogout"/>
+            <deleteData createDataKey="createPurchaseOrderCreatorCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteAdminCustomer"/>
+            <actionGroup ref="AdminDeleteAllGiftCardAccountsActionGroup" stepKey="deleteGiftCardAccount"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="adminLogout"/>
+        </after>
+
+        <!-- Create Gift Card Account -->
+        <actionGroup ref="AddGiftCardAccountActionGroup" stepKey="createGiftCardAccount">
+            <argument name="website" value="Main Website"/>
+            <argument name="balanceAmount" value="1000"/>
+        </actionGroup>
+        <grabTextFrom selector="{{AdminGiftCardAccountGridSection.giftCardCode}}" stepKey="grabGiftCardCode"/>
+
+        <!-- Begin to Create Purchase Order & Go to Checkout Payment Page -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser">
+            <argument name="Customer" value="$$createPurchaseOrderCreatorCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart"/>
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage"/>
+
+        <!-- Change Shipping Address -->
+        <actionGroup ref="StorefrontClickAddNewAddressButtonFromCheckoutShippingActionGroup" stepKey="clickAddNewAddressButton"/>
+        <actionGroup ref="StorefrontFillNewShippingAddressFormInCheckoutActionGroup" stepKey="fillAddressForm">
+            <argument name="address" value="US_Address_California"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontCheckoutClickSaveAddressButtonActionGroup" stepKey="clickOnSaveNewAddress"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep"/>
+
+        <!-- Verify PayPal Place Order Buttons Are Not Available & Payment Deferred Message Are Visible -->
+        <actionGroup ref="StorefrontPurchaseOrderCheckoutSelectPayPalExpressActionGroup" stepKey="selectPayPalExpress" />
+        <actionGroup ref="StorefrontValidatePurchaseOrderInitialCheckoutDeferredPaymentActionGroup" stepKey="validateInitialCheckoutDeferredPayment"/>
+        <dontSeeElementInDOM selector="{{CheckoutPaymentSection.payPalFrame}}" stepKey="dontSeePayPalFrame"/>
+
+        <!-- Apply Gift Card To Cover Entire Purchase -->
+        <actionGroup ref="ApplyGiftCardToOrderActionGroup" stepKey="applyGiftCardToOrder">
+            <argument name="code" value="$grabGiftCardCode"/>
+        </actionGroup>
+
+        <!-- Verify Payment Is No Longer Required -->
+        <waitForText selector="{{CheckoutPaymentSection.notAvailablePaymentSolutions}}" userInput="No Payment Information Required" stepKey="assertAllPaymentsAreAbsent"/>
+
+        <!-- Remove Gift Card -->
+        <actionGroup ref="StorefrontRemoveGiftCardCheckoutActionGroup" stepKey="removeGiftCardFromOrder">
+            <argument name="code" value="$grabGiftCardCode"/>
+        </actionGroup>
+
+        <!-- Verify PayPal Payment Method Reappears & Place Order Buttons Are Not Available -->
+        <actionGroup ref="StorefrontValidatePurchaseOrderInitialCheckoutDeferredPaymentActionGroup" stepKey="validateInitialCheckoutDeferredPayment2"/>
+        <dontSeeElementInDOM selector="{{CheckoutPaymentSection.payPalFrame}}" stepKey="dontSeePayPalFrame2"/>
+
+        <!-- Place Purchase Order -->
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderNumber"/>
+
+        <!-- Verify PO Details, 'Approved - Pending Payment' Status, & Place Order Button and Link Are Visible to Buyer -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovalRequired">
+            <argument name="status" value="{{PurchaseOrderStatuses.approvedPendingPayment}}"/>
+        </actionGroup>
+        <grabFromCurrentUrl regex="~request_id\/(\d+)~" stepKey="purchaseOrderId"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderPendingPaymentPageAsBuyerActionGroup" stepKey="verifyPageAppearanceForBuyer"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.productName}}" userInput="$$product1.name$$" stepKey="seeProductNamePurchaseOrder"/>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderGrandTotal}}" userInput="$992.65" stepKey="seeGrandTotalPurchaseOrder"/>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.paymentMethod}}" userInput="PayPal Express Checkout" stepKey="seePaymentMethodPurchaseOrder"/>
+        <waitForText selector="{{StorefrontCustomerAddressesSection.shippingAddress}}" userInput="{{US_Address_California.street[0]}}" stepKey="seeShippingAddressPurchaseOrder"/>
+
+        <!-- Verify Place Order Button and Link Are Not Visible to Company Admin -->
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutPurchaser"/>
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontNavigateToCompanyPurchaseOrdersPageActionGroup" stepKey="navigateToCompanyPurchaseOrdersPageAsAdmin"/>
+        <actionGroup ref="StorefrontNavigateToViewPurchaseOrderPageActionGroup" stepKey="navigateToViewPurchaseOrderPageAsAdmin">
+            <argument name="tabName" value="company"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderNumber"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderPendingPaymentPageAsApproverActionGroup" stepKey="verifyPageAppearanceForApprover"/>
+
+        <!-- Proceed to Final Checkout Payment Page as Buyer -->
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCompanyAdmin2"/>
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser2">
+            <argument name="Customer" value="$$createPurchaseOrderCreatorCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontNavigateToMyPurchaseOrdersPageActionGroup" stepKey="navigateToMyPurchaseOrdersPage"/>
+        <actionGroup ref="StorefrontNavigateToViewPurchaseOrderPageActionGroup" stepKey="navigateToViewPurchaseOrderPage">
+            <argument name="tabName" value="my"/>
+            <argument name="purchaseOrderNumber" value="$purchaseOrderNumber"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontClickPlaceOrderLinkInBannerActionGroup" stepKey="clickPlaceOrderLink"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderFinalCheckoutPageActionGroup" stepKey="validateFinalCheckoutPage"/>
+
+        <!-- Verify Buyer Can Select PayPal Express Payment Method for Final Checkout -->
+        <actionGroup ref="StorefrontPurchaseOrderCheckoutSelectPayPalExpressActionGroup" stepKey="selectPayPalExpress2"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderFinalCheckoutDeferredPaymentActionGroup" stepKey="validateFinalCheckoutDeferredPayment"/>
+
+        <!-- Verify Shipping Address is Correct -->
+        <waitForText selector="{{CheckoutPaymentSection.shipToInformation}}" userInput="{{US_Address_California.street[0]}}" stepKey="verifyShippingAddressCheckout"/>
+
+        <!-- Select Check Money Order Payment Method & Place Order -->
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMO"/>
+        <actionGroup ref="ClickPlaceOrderActionGroup" stepKey="placeOrder"/>
+
+        <!-- Verify Created Order -->
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber22}}" stepKey="orderNumber"/>
+        <actionGroup ref="StorefrontOpenOrderFromSuccessPageActionGroup" stepKey="openOrderFromSuccessPage">
+            <argument name="orderNumber" value="{$orderNumber}"/>
+        </actionGroup>
+        <waitForText selector="{{StorefrontOrderDetailsSection.purchaseOrderLink}}" userInput="#{$purchaseOrderNumber}" stepKey="seePurchaseOrderLinkOrder"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.productName}}" userInput="$$product1.name$$" stepKey="seeProductNameOrder"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.grandTotal}}" userInput="$992.65" stepKey="seeGrandTotalOrder"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.paymentMethod}}" userInput="Check / Money order" stepKey="seePaymentMethodOrder"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.shippingAddress}}" userInput="{{US_Address_California.street[0]}}" stepKey="seeShippingAddressOrder"/>
+
+        <!-- Verify Purchase Order Details & "Approved - Ordered" Status -->
+        <actionGroup ref="StorefrontGoToPurchaseOrderDetailsPageActionGroup" stepKey="goToPurchaseOrderDetailsPage">
+            <argument name="purchaseOrderId" value="{$purchaseOrderId}"/>
+            <argument name="purchaseOrderNumber" value="{$purchaseOrderNumber}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovedOrdered">
+            <argument name="status" value="{{PurchaseOrderStatuses.ordered}}"/>
+        </actionGroup>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderOrderLink}}" userInput="{$orderNumber}" stepKey="seeOrderLinkPurchaseOrder2"/>
+        <waitForText selector="{{StorefrontCustomerOrderViewSection.productName}}" userInput="$$product1.name$$" stepKey="seeProductNamePurchaseOrder2"/>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.purchaseOrderGrandTotal}}" userInput="$992.65" stepKey="seeGrandTotalPurchaseOrder2"/>
+        <waitForText selector="{{StorefrontPurchaseOrderViewSection.paymentMethod}}" userInput="PayPal Express Checkout" stepKey="seePaymentMethodPurchaseOrder2"/>
+    </test>
+</tests>

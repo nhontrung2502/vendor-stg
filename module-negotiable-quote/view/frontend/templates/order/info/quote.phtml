@@ -1,0 +1,46 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\NegotiableQuote\Block\Order\Info\Quote $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$quoteWebsiteNotice = 'This quote cannot be viewed at the current website. Would you like to ' .
+    'navigate to the website where you created this quote?';
+?>
+<?php if ($block->isNegotiableQuote()): ?>
+    <div data-bind="scope: 'negotiable_quote_link'" class="order-reference-content actions negotiable-quote-link">
+        <strong><?= $escaper->escapeHtml(__('Quote:')) ?></strong>
+        <?php if ($block->isQuoteStoreEnabled()): ?>
+            <a class="action quote"
+               data-bind="click: click"
+               target="_blank"
+               title="View Negotiable Quote"
+               href="<?= $escaper->escapeUrl($block->getViewQuoteUrl()) ?>">
+                <span><?= $escaper->escapeHtml($block->getQuoteName()) ?></span>
+            </a>
+        <?php else: ?>
+            <span><?= $escaper->escapeHtml($block->getQuoteName()) ?></span>
+        <?php endif; ?>
+    </div>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "negotiable_quote_link": {
+                            "component": "Magento_NegotiableQuote/js/link_confirmation",
+                            "isEnable": <?= (int) !$block->isCurrentStoreQuote() ?>,
+                            "modalConfig": {
+                                "title": "<?= $escaper->escapeJs(__('Cannot Open the Quote')) ?>",
+                                "content": "<?= $escaper->escapeJs($quoteWebsiteNotice) ?>"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<?php endif; ?>

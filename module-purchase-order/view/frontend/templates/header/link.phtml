@@ -1,0 +1,31 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\PurchaseOrder\Block\Link\PurchaseOrder $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<!-- ko scope: 'purchase_order' -->
+<!-- ko if: config().isEnabled && isPurchaseOrderAllAllowed()-->
+<li class="link">
+    <a <?= /* @noEscape */ $block->getLinkAttributes() ?>>
+        <?= $escaper->escapeHtml($block->getLabel()) ?>
+    </a>
+</li>
+<!-- /ko -->
+<!-- /ko -->
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "purchase_order": {
+                        "component": "Magento_PurchaseOrder/js/view/purchase-order"
+                    }
+                }
+            }
+        }
+    }
+</script>

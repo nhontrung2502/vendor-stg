@@ -1,0 +1,29 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//  Ascend & Descend sort marker
+& when (@media-common = true) {
+    .data-grid .data-grid-th._sortable {
+        cursor: pointer;
+
+        &._ascend > span.data-grid-cell-content:after {
+            background: url('@{baseDir}Magento_PurchaseOrderRule/images/ArrowDownSmall.svg') no-repeat center;
+            content: '';
+            display: inline-block;
+            height: 10px;
+            padding-left: 15px;
+            width: 8px;
+        }
+
+        &._descend > span.data-grid-cell-content:after {
+            background: url('@{baseDir}Magento_PurchaseOrderRule/images/ArrowUpSmall.svg') no-repeat center;
+            content: '';
+            display: inline-block;
+            height: 10px;
+            padding-left: 15px;
+            width: 8px;
+        }
+    }
+}

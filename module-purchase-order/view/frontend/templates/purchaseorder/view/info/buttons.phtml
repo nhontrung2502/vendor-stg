@@ -1,0 +1,70 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Info\Buttons $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="po-action-toolbar">
+    <div class="actions quote-view-links quote-view-buttons">
+        <?php if ($block->canApprove()): ?>
+            <form data-role="approve-form" class="quote-approve-action"
+                  action="<?= $escaper->escapeUrl($block->getApproveUrl()) ?>"
+                  method="post"
+                  data-mage-init='{"Magento_PurchaseOrder/js/view/purchase-order/action-button":
+                    {"commentSelector": ".block-comments .comments-field-control textarea"}}'>
+                <?= $block->getBlockHtml('formkey') ?>
+                <button type="submit" class="action approve primary">
+                    <span><?= $escaper->escapeHtml(__('Approve Purchase Order')) ?></span>
+                </button>
+            </form>
+        <?php endif; ?>
+
+        <?php if ($block->canReject()): ?>
+            <form data-role="reject-form"
+                  action="<?= $escaper->escapeUrl($block->getRejectUrl()) ?>"
+                  method="post"
+                  data-mage-init='{"Magento_PurchaseOrder/js/view/purchase-order/action-button":
+                    {"commentSelector": ".block-comments .comments-field-control textarea"}}'>
+                <?= $block->getBlockHtml('formkey') ?>
+                <button type="submit" class="action approve">
+                    <span><?= $escaper->escapeHtml(__('Reject Purchase Order')) ?></span>
+                </button>
+            </form>
+        <?php endif; ?>
+
+        <?php if ($block->canOrder()): ?>
+            <form data-role="placeorder-form"
+                  action="<?= $escaper->escapeUrl($block->getPlaceOrderUrl()) ?>"
+                  method="post"
+                  data-mage-init='{"Magento_PurchaseOrder/js/view/purchase-order/action-button":
+                    {"commentSelector": ".block-comments .comments-field-control textarea"}}'>
+                <?= $block->getBlockHtml('formkey') ?>
+                <?php if ($block->paymentRequired()): ?>
+                <input type="hidden" name="payment_redirect" value="1">
+                <?php endif; ?>
+                <button type="submit" class="action placeorder primary">
+                    <span><?= $escaper->escapeHtml(__('Place Order')) ?></span>
+                </button>
+            </form>
+        <?php endif; ?>
+
+        <?php if ($block->canCancel()): ?>
+            <form data-role="cancel-form"
+                  action="<?= $escaper->escapeUrl($block->getCancelUrl()) ?>"
+                  method="post"
+                  data-mage-init='{"Magento_PurchaseOrder/js/view/purchase-order/action-button":
+                    {"commentSelector": ".block-comments .comments-field-control textarea"}}'>
+                <?= $block->getBlockHtml('formkey') ?>
+                <button type="submit" class="action cancelpurchaseorder ">
+                    <span><?= $escaper->escapeHtml(__('Cancel Purchase Order')) ?></span>
+                </button>
+            </form>
+        <?php endif; ?>
+        <?= $block->getChildHtml('purchase.order.info.buttons.additional') ?>
+    </div>
+</div>

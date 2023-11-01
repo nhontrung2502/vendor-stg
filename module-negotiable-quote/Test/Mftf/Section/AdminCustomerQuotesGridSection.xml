@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminCustomerQuotesGridSection">
+        <element name="grid" type="block" timeout="30" selector="table#negotiable_quotes_table"/>
+        <element name="columnHeader" type="button" timeout="30" parameterized="true" selector="//tr/th[contains(@class, 'data-grid-th')]/span[text() = '{{label}}']"/>
+        <element name="quoteNumber" type="text" timeout="30" parameterized="true" selector="//tr[{{rowIndex}}]//td[contains(@class,'col-entity_id')]"/>
+        <element name="createdDate" type="text" timeout="30" parameterized="true" selector="//tr[{{rowIndex}}]//td[contains(@class,'col-created_at')]"/>
+        <element name="lastUpdated" type="text" timeout="30" parameterized="true" selector="//tr[{{rowIndex}}]//td[contains(@class,'col-updated_at')]"/>
+        <element name="salesRep" type="text" timeout="30" parameterized="true" selector="//tr[{{rowIndex}}]//td[contains(@class,'col-sales_rep')]"/>
+        <element name="quoteTotalBase" type="text" timeout="30" parameterized="true" selector="//tr[{{rowIndex}}]//td[contains(@class,'col-grand_total')]"/>
+        <element name="quoteTotalNegotiated" type="text" timeout="30" parameterized="true" selector="//tr[{{rowIndex}}]//td[contains(@class,'col-negotiated_grand_total')]"/>
+        <element name="status" type="text" timeout="30" parameterized="true" selector="//tr[{{rowIndex}}]//td[contains(@class,'col-status')]"/>
+        <element name="viewAction" type="text" timeout="30" parameterized="true" selector="//tr[{{rowIndex}}]/td//a[text()='View']"/>
+    </section>
+</sections>

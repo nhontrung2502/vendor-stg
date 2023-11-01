@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<suites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Suite/etc/suiteSchema.xsd">
+    <suite name="PurchaseOrderSuite">
+        <before>
+            <magentoCLI command="config:set {{EnableCompanyConfigData.path}} {{EnableCompanyConfigData.value}}" stepKey="enableCompanies"/>
+            <magentoCLI command="config:set {{EnablePurchaseOrderConfigurationData.path}} {{EnablePurchaseOrderConfigurationData.value}}" stepKey="enablePurchaseOrders"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set {{DisableCompanyConfigData.path}} {{DisableCompanyConfigData.value}}" stepKey="disableCompanies"/>
+            <magentoCLI command="config:set {{DisablePurchaseOrderConfigurationData.path}} {{DisablePurchaseOrderConfigurationData.value}}" stepKey="disablePurchaseOrders"/>
+        </after>
+        <include>
+            <group name="purchase_orders"/>
+        </include>
+    </suite>
+</suites>

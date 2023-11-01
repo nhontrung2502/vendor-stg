@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminDisablePurchaseOrderForStoreActionGroup">
+        <annotations>
+            <description>Goes to Admin B2B Config Page. Disable Purchase Order Approval Config. Saves configuration and validates success message.</description>
+        </annotations>
+        <amOnPage url="{{AdminEnableOrDisablePurchasePage.url}}" stepKey="goToAdminB2BConfigPage"/>
+        <waitForPageLoad stepKey="waitForB2BPageToLoad"/>
+        <waitForElementVisible selector="{{AdminB2BConfigSection.enablePurchaseOrders}}"  stepKey="waitForElementVisible"/>
+        <selectOption selector="{{AdminB2BConfigSection.enablePurchaseOrders}}" userInput="{{DisablePurchaseOrderConfigurationData.value}}" stepKey="disablePurchaseOrders"/>
+        <click selector="{{AdminMainActionsSection.save}}" stepKey="saveConfiguration"/>
+        <waitForPageLoad stepKey="waitForSaveConfigurationMessageTillThePageGetsLoaded"/>
+        <see selector="{{AdminMessagesSection.success}}" userInput="You saved the configuration." stepKey="seeSuccessMessage"/>
+    </actionGroup>
+</actionGroups>

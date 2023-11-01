@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" extends="ClickPlaceOrderActionGroup">
+        <annotations>
+            <description>Clicks on the 'Place Purchase Order' button. Validates that the Success Message is present and correct.</description>
+        </annotations>
+        <waitForElement selector="{{StorefrontCheckoutPurchaseOrderPaymentMethodSection.placePurchaseOrderButton}}" time="30" stepKey="waitForPlaceOrderButton"/>
+        <click selector="{{StorefrontCheckoutPurchaseOrderPaymentMethodSection.placePurchaseOrderButton}}" stepKey="clickPlaceOrder"/>
+        <waitForPageLoad after="clickPlaceOrder" stepKey="waitForSuccessPage"/>
+        <comment userInput="BIC workaround" stepKey="waitForPageTitle" after="waitForSuccessPage"/>
+        <waitForText userInput="Your Purchase Order has been submitted for approval." selector="{{StorefrontPurchaseOrderSuccessSection.pageTitle}}" stepKey="waitForLoadSuccessPage"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderLink}}" stepKey="waitForPurchaseOrderLink" after="waitForLoadSuccessPage"/>
+    </actionGroup>
+</actionGroups>

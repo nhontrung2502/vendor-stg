@@ -1,0 +1,312 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\PurchaseOrder\Api\Data\PurchaseOrderInterface" type="Magento\PurchaseOrder\Model\PurchaseOrder" />
+    <preference for="Magento\PurchaseOrder\Api\PurchaseOrderRepositoryInterface" type="Magento\PurchaseOrder\Model\PurchaseOrderRepository" />
+    <preference for="Magento\PurchaseOrder\Api\PurchaseOrderManagementInterface" type="Magento\PurchaseOrder\Model\PurchaseOrderManagement" />
+    <preference for="Magento\PurchaseOrder\Api\Data\PurchaseOrderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <preference for="Magento\PurchaseOrder\Api\Data\PurchaseOrderLogInterface" type="Magento\PurchaseOrder\Model\PurchaseOrderLog" />
+    <preference for="Magento\PurchaseOrder\Model\ProcessorInterface" type="Magento\PurchaseOrder\Model\PurchaseOrderProcessor" />
+    <preference for="Magento\PurchaseOrder\Model\PurchaseOrderLogRepositoryInterface" type="Magento\PurchaseOrder\Model\PurchaseOrderLogRepository" />
+    <preference for="Magento\PurchaseOrder\Model\Notification\NotifierInterface" type="Magento\PurchaseOrder\Model\Notification\Notifier" />
+    <preference for="Magento\PurchaseOrder\Model\Notification\SenderInterface" type="Magento\PurchaseOrder\Model\Notification\Email\Sender" />
+    <preference for="Magento\PurchaseOrder\Model\PurchaseOrder\LogManagementInterface" type="Magento\PurchaseOrder\Model\PurchaseOrder\LogManagement" />
+    <preference for="Magento\PurchaseOrder\Model\Payment\DeferredPaymentStrategyInterface"
+                type="Magento\PurchaseOrder\Model\Payment\DeferredPaymentStrategy"/>
+
+    <type name="Magento\PurchaseOrder\Model\Payment\DeferredPaymentStrategyInterface">
+        <arguments>
+            <argument name="overrides" xsi:type="array">
+                <item name="deferred" xsi:type="array">
+                    <item name="amazon_payment" xsi:type="string">amazon_payment</item>
+                </item>
+                <item name="undeferred" xsi:type="array">
+                    <item name="free" xsi:type="string">free</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="my_purchaseorder_listing_data_source" xsi:type="string">myPurchaseOrderCollection</item>
+                <item name="company_purchaseorder_listing_data_source" xsi:type="string">Magento\PurchaseOrder\Model\ResourceModel\PurchaseOrder\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="myPurchaseOrderCollection" type="Magento\PurchaseOrder\Model\ResourceModel\PurchaseOrder\Grid\Collection">
+        <arguments>
+            <argument name="filterCurrentCustomer" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+    <preference for="Magento\PurchaseOrder\Model\Validator\ValidatorInterface" type="Magento\PurchaseOrder\Model\Validator\Composite" />
+    <virtualType name="placePoValidatorComposite" type="Magento\PurchaseOrder\Model\Validator\Composite">
+        <arguments>
+            <argument name="validators" xsi:type="array" />
+        </arguments>
+    </virtualType>
+    <preference for="Magento\PurchaseOrder\Api\PurchaseOrderPaymentInformationManagementInterface"
+                type="Magento\PurchaseOrder\Model\PurchaseOrderPaymentInformationManagement"/>
+
+    <preference for="Magento\PurchaseOrder\Model\Processor\ApprovalProcessorInterface" type="Magento\PurchaseOrder\Model\Processor\ApprovalsComposite" />
+    <virtualType name="approvalProcessorComposite" type="Magento\PurchaseOrder\Model\Processor\ApprovalsComposite">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="adminApproval" xsi:type="array">
+                    <item name="processorClass" xsi:type="string">Magento\PurchaseOrder\Model\Processor\AdminApprovalProcessor</item>
+                    <item name="priority" xsi:type="string">10</item>
+                </item>
+                <item name="managerApproval" xsi:type="array">
+                    <item name="processorClass" xsi:type="string">Magento\PurchaseOrder\Model\Processor\ManagerApprovalProcessor</item>
+                    <item name="priority" xsi:type="string">20</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\PurchaseOrder\Controller\PurchaseOrder\Approve">
+        <arguments>
+            <argument name="purchaseOrderApprovalsProcessor" xsi:type="object">approvalProcessorComposite</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\PurchaseOrderBulkManagement">
+        <arguments>
+            <argument name="purchaseOrderApprovalsProcessor" xsi:type="object">approvalProcessorComposite</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\SalesSequence\Model\EntityPool">
+        <arguments>
+            <argument name="entities" xsi:type="array">
+                <item name="purchase_order" xsi:type="string">purchase_order</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\PurchaseOrderPaymentInformationManagement">
+        <arguments>
+            <argument name="purchaseOrderValidator" xsi:type="object">placePoValidatorComposite</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\RequestApproval">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\CreatorStructureParent</argument>
+            <argument name="contentSourceType" xsi:type="string">Magento\PurchaseOrder\Model\Notification\Email\ContentSource\RequestApprovalAction</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\ApprovalAndPaymentDetailsRequired">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\PurchaseOrderCreator</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\ApprovalRequired">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\PurchaseOrderCreator</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\AutoApproved">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\PurchaseOrderCreator</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\AutoApprovedPendingPayment">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\PurchaseOrderCreator</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\Approved">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\PurchaseOrderCreator</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\ApprovedPaymentDetailsRequired">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\PurchaseOrderCreator</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\Rejected">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\PurchaseOrderCreator</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\CommentAdded">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\ConversationParticipants</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Action\OrderPlacementFailed">
+        <arguments>
+            <argument name="recipientResolver" xsi:type="object">Magento\PurchaseOrder\Model\Notification\Action\Recipient\Resolver\PurchaseOrderCreator</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Magento\PurchaseOrder\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">orderapprovalsCronOrder</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Magento\PurchaseOrder\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference for="Magento\PurchaseOrder\Api\Data\CommentInterface" type="Magento\PurchaseOrder\Model\Comment" />
+    <preference for="Magento\PurchaseOrder\Model\CommentManagementInterface" type="Magento\PurchaseOrder\Model\CommentManagement" />
+    <preference for="Magento\PurchaseOrder\Model\CommentRepositoryInterface" type="Magento\PurchaseOrder\Model\CommentRepository" />
+
+    <type name="Magento\Framework\MessageQueue\MergerFactory">
+        <arguments>
+            <argument name="mergers" xsi:type="array">
+                <item name="purchaseorder.toorder" xsi:type="string">Magento\PurchaseOrder\Model\Merger</item>
+                <item name="purchaseorder.transactional.email" xsi:type="string">Magento\PurchaseOrder\Model\Merger</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference for="Magento\PurchaseOrder\Model\Company\ConfigInterface" type="Magento\PurchaseOrder\Model\Company\Config" />
+    <preference for="Magento\PurchaseOrder\Model\Company\Config\RepositoryInterface" type="Magento\PurchaseOrder\Model\Company\Config\Repository" />
+
+    <!-- Save Purchase Order Config -->
+    <type name="Magento\Company\Api\CompanyRepositoryInterface">
+        <plugin name="purchase_order_company_repository" type="Magento\PurchaseOrder\Plugin\Company\Model\CompanyRepository" />
+    </type>
+
+    <!-- Read Purchase Order Config -->
+    <type name="Magento\Company\Model\Company\DataProvider">
+        <plugin name="purchase_order_company_data_provider" type="Magento\PurchaseOrder\Plugin\Company\Model\DataProvider" />
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Customer\Authorization">
+        <arguments>
+            <argument name="actionAuthorizationPool" xsi:type="array">
+                <item name="placeorder" xsi:type="string">Magento\PurchaseOrder\Model\Customer\Authorization\PlaceOrder</item>
+                <item name="approve" xsi:type="string">Magento\PurchaseOrder\Model\Customer\Authorization\ApproveRejectPurchaseOrder</item>
+                <item name="reject" xsi:type="string">Magento\PurchaseOrder\Model\Customer\Authorization\ApproveRejectPurchaseOrder</item>
+                <item name="cancel" xsi:type="string">Magento\PurchaseOrder\Model\Customer\Authorization\CancelPurchaseOrder</item>
+                <item name="view" xsi:type="string">Magento\PurchaseOrder\Model\Customer\Authorization\ViewPurchaseOrder</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Validator\ActionReady\ValidatorLocator">
+        <arguments>
+            <argument name="actionReadyValidatorPool" xsi:type="array">
+                <item name="placeorder" xsi:type="string">Magento\PurchaseOrder\Model\Validator\ActionReady\PlaceOrderValidator</item>
+                <item name="approve" xsi:type="string">Magento\PurchaseOrder\Model\Validator\ActionReady\ApprovePurchaseOrderValidator</item>
+                <item name="reject" xsi:type="string">Magento\PurchaseOrder\Model\Validator\ActionReady\RejectPurchaseOrderValidator</item>
+                <item name="cancel" xsi:type="string">Magento\PurchaseOrder\Model\Validator\ActionReady\CancelPurchaseOrderValidator</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Model\Notification\Notifier">
+        <arguments>
+            <argument name="notificationConfigProviders" xsi:type="array">
+                <item name="Magento\PurchaseOrder\Model\Notification\ActionNotificationInterface" xsi:type="string">Magento\PurchaseOrder\Model\Notification\Config\Provider\PurchaseOrder</item>
+                <item name="Magento\PurchaseOrder\Model\Notification\Action\CommentAdded" xsi:type="string">Magento\PurchaseOrder\Model\Notification\Config\Provider\PurchaseOrderComment</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\PurchaseOrder\Block\PurchaseOrder\History">
+        <arguments>
+            <argument name="actions" xsi:type="array">
+                <item name="submit" xsi:type="array">
+                    <item name="message" xsi:type="string" translate="true">Purchase Order #%increment_id was Submitted</item>
+                </item>
+                <item name="place_order_fail" xsi:type="array">
+                    <item name="message" xsi:type="string" translate="true">Failed to create Order from Purchase Order #%increment_id with Error - %error_message</item>
+                    <item name="translate_params" xsi:type="array">
+                        <item name="error_message" xsi:type="string">error_message</item>
+                    </item>
+                </item>
+                <item name="auto_approve" xsi:type="array">
+                    <item name="message" xsi:type="string" translate="true">Purchase Order #%increment_id was automatically approved</item>
+                </item>
+                <item name="place_order" xsi:type="array">
+                    <item name="message" xsi:type="string" translate="true">Successfully created Order #%order_increment_id from Purchase Order #%increment_id</item>
+                </item>
+                <item name="reject" xsi:type="array">
+                    <item name="message" xsi:type="string" translate="true">Purchase Order #%increment_id was Rejected</item>
+                </item>
+                <item name="approve" xsi:type="array">
+                    <item name="message" xsi:type="string" translate="true">Purchase Order #%increment_id was Approved</item>
+                </item>
+                <item name="cancel" xsi:type="array">
+                    <item name="message" xsi:type="string" translate="true">Purchase Order #%increment_id was Canceled</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\NegotiableQuote\Model\History\SnapshotManagement">
+        <plugin name="change_author_to_system_if_purchase_order_is_in_final_status"
+                type="Magento\PurchaseOrder\Plugin\NegotiableQuote\Model\History\SnapshotManagement" />
+    </type>
+
+    <type name="Magento\Company\Model\ResourcePool">
+        <arguments>
+            <argument name="resources" xsi:type="array">
+                <item name="purchase_order_all" xsi:type="string">Magento_PurchaseOrder::all</item>
+                <item name="purchase_order_view_purchase_orders" xsi:type="string">Magento_PurchaseOrder::view_purchase_orders</item>
+                <item name="purchase_order_view_purchase_orders_for_subordinates" xsi:type="string">Magento_PurchaseOrder::view_purchase_orders_for_subordinates</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Quote\Api\CartRepositoryInterface">
+        <plugin name="purchaseOrderCartRepositoryPlugin" sortOrder="40"
+                type="Magento\PurchaseOrder\Plugin\Quote\Model\QuoteRepositoryPlugin"/>
+    </type>
+    <type name="\Magento\Quote\Model\QuoteManagement">
+        <plugin name="purchaseOrderCartManagementPlugin" sortOrder="40"
+                type="Magento\PurchaseOrder\Plugin\Quote\Model\QuoteManagementPlugin"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Coupon\Quote\UpdateCouponUsages">
+        <plugin name="purchaseOrderSalesRuleUpdateCouponUsagesPlugin" sortOrder="10"
+                type="Magento\PurchaseOrder\Plugin\Quote\Model\UpdateCouponUsagesPlugin"/>
+    </type>
+    <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
+        <plugin name="process_shipping_custom_customer_attributes" type="Magento\PurchaseOrder\Model\Plugin\ProcessCustomCustomerAttributes"/>
+    </type>
+    <type name="Magento\Checkout\Model\Session">
+        <plugin name="purchaseOrderCheckoutSessionPlugin" type="Magento\PurchaseOrder\Plugin\Checkout\Model\SessionPlugin"/>
+    </type>
+    <type name="Magento\Checkout\Controller\Index\Index">
+        <plugin name="redirectPurchaserOrderCheckout" type="Magento\PurchaseOrder\Plugin\Checkout\Controller\Index\IndexPlugin"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote">
+        <plugin name="purchaseOrderQuoteAroundPlugin" type="Magento\PurchaseOrder\Plugin\Quote\Model\QuotePlugin"/>
+    </type>
+    <type name="Magento\CompanyCredit\Model\CompanyCreditPaymentConfigProvider">
+        <plugin name="purchaseOrderCompanyCreditConfigProviderPlugin" type="Magento\PurchaseOrder\Plugin\CompanyCredit\CompanyCreditPaymentConfigProviderPlugin"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote\Address">
+        <plugin name="purchaseOrderQuoteAddress" type="Magento\PurchaseOrder\Plugin\Quote\Model\AddressPlugin"/>
+    </type>
+    <type name="Magento\PurchaseOrder\Model\Notification\Config">
+        <plugin name="purchaseOrderDisableCommunications" type="Magento\PurchaseOrder\Model\Plugin\DisableCommunicationsForPurchaseOrders" />
+    </type>
+</config>

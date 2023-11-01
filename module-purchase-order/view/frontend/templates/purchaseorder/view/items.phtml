@@ -1,0 +1,36 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\PurchaseOrder\Block\PurchaseOrder\Items $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="purchase-order-items" id="quote-items">
+    <table id="purchase-order-table" class="items data table purchase-order-table-items">
+        <thead>
+        <tr>
+            <th class="col item" scope="col"><span><?= $escaper->escapeHtml(__('Product Name')) ?></span></th>
+            <th class="col sku" scope="col"><span><?= $escaper->escapeHtml(__('SKU')) ?></span></th>
+            <th class="col price" scope="col"><span><?= $escaper->escapeHtml(__('Price')) ?></span></th>
+            <th class="col qty" scope="col"><span><?= $escaper->escapeHtml(__('Qty')) ?></span></th>
+            <th class="col subtotal" scope="col"><span><?= $escaper->escapeHtml(__('Subtotal')) ?></span></th>
+        </tr>
+        </thead>
+        <?php foreach ($block->getItems() as $item): ?>
+            <?php if (!$item->isDeleted() && !$item->getParentItemId()): ?>
+                <?= $block->getItemHtml($item) ?>
+            <?php endif ?>
+        <?php endforeach ?>
+    </table>
+    <div class="quote-table-totals-wrap purchase-order-totals-wrap">
+        <table id="shopping-cart-table-totals" class="items data table quote-table-totals purchase-order-totals">
+            <tfoot>
+            <?= $block->getChildHtml() ?>
+            </tfoot>
+        </table>
+    </div>
+</div>

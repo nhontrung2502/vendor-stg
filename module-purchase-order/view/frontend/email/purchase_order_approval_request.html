@@ -1,0 +1,56 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!--@subject {{trans "Purchase Order #%increment_id is ready for your approval" increment_id=$data.purchase_order_increment_id}} @-->
+<!--@vars {
+"var store":"Store",
+"var data.purchase_order_increment_id":"Purchase Order Increment Id",
+"var data.purchase_order_id":"Purchase Order Id",
+"var data.recipient_full_name":"Recipient Full Name",
+"var data.buyer_full_name":"Buyer Fullname",
+"var this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])":"Purchase Order View Url"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table class="button" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans "%recipient_full_name," recipient_full_name=$data.recipient_full_name}}</p>
+            <p>
+                {{trans "%buyer_full_name placed a Purchase Order that requires your approval." buyer_full_name=$data.buyer_full_name}}
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table class="inner-wrapper" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td align="center">
+                        {{trans "<a href="%purchase_order_view_url">Review Purchase Order</a>"
+                        purchase_order_view_url=$this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])
+                        |raw}}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr class="email-intro">
+        <td>
+            <p>
+                {{trans "The Purchase Order details are below."}}
+                {{trans "You can approve or decline the Purchase Order by following this link:"}}
+                {{trans "<a href="%purchase_order_view_url">#%increment_id</a>"
+                increment_id=$data.purchase_order_increment_id
+                purchase_order_view_url=$this.getUrl($store,'purchaseorder/purchaseorder/view/',[_nosid:1,request_id:$data.purchase_order_id])
+                |raw}}
+            </p>
+        </td>
+    </tr>
+    {{layout handle="email_purchaseorder_details" area="frontend" purchaseOrderId=$data.purchase_order_id}}
+</table>
+
+{{template config_path="design/email/footer_template"}}

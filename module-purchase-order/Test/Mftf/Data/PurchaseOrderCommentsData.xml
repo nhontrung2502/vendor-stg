@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="PurchaseOrderDefaultComment" type="purchase_order_comment">
+        <data key="comment">This is an example default test comment.</data>
+    </entity>
+    <entity name="PurchaseOrderPlaceOrderComment" type="purchase_order_comment">
+        <data key="comment">An example comment when placing an order.</data>
+    </entity>
+    <entity name="PurchaseOrderAdminComment" type="purchase_order_comment">
+        <data key="comment">This is our admin test, manual comment.</data>
+    </entity>
+</entities>

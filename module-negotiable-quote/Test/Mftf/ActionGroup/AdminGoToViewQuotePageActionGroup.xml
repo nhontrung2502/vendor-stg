@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminGoToViewQuotePageActionGroup">
+        <annotations>
+            <description>Goes to the Admin View Quote details page for the provided quote id.</description>
+        </annotations>
+        <arguments>
+            <argument name="quoteId" type="string"/>
+        </arguments>
+        <amOnPage url="{{AdminNegotiableQuoteViewPage.url(quoteId)}}" stepKey="openViewQuotePage"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <waitForText userInput="Quote #{{quoteId}}" selector="{{AdminGridHeaders.title}}" stepKey="waitForPageTitle"/>
+    </actionGroup>
+</actionGroups>

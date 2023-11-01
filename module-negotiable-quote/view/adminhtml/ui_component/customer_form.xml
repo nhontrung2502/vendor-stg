@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <htmlContent name="quotes_content">
+        <block class="Magento\NegotiableQuote\Block\Adminhtml\CustomerEdit\Tab" name="quotes">
+            <arguments>
+                <argument name="sort_order" xsi:type="number">40</argument>
+            </arguments>
+        </block>
+    </htmlContent>
+</form>

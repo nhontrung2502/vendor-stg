@@ -1,0 +1,20 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var $block \Magento\PurchaseOrder\Block\PurchaseOrder\Items\Messages
+ * @var $escaper \Magento\Framework\Escaper
+ */
+?>
+
+<?php if ($block->getItemMessages() && $block->shouldShowMessages()): ?>
+    <?php foreach ($block->getItemMessages() as $message): ?>
+        <div class="cart item message <?= $escaper->escapeHtml($message['type']) ?>">
+            <div><?= $escaper->escapeHtml($message['text']) ?></div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+

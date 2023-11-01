@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontNegotiableQuoteSendForReviewActionGroup">
+        <annotations>
+            <description>You are on the Storefront Negotiable Quote view page, press 'Send For Review' button</description>
+        </annotations>
+        <grabFromCurrentUrl regex="~/quote_id/(\d+)/~" stepKey="grabQuoteFromUrl"/>
+        <click selector="{{StorefrontNegotiableQuoteViewSection.sendForReview}}" stepKey="clickSendForReviewButton"/>
+        <seeInCurrentUrl url="{{StorefrontNegotiableQuoteSendPage.url}}" stepKey="seeQuoteSendPage"/>
+        <see selector="{{StorefrontNegotiableQuoteSendMainSection.successTitle}}" userInput="Success Page" stepKey="seeSuccessTitle"/>
+        <see selector="{{StorefrontNegotiableQuoteSendMainSection.quoteMessage}}" userInput="Your quote number is: " stepKey="seeQuoteMessage"/>
+        <see selector="{{StorefrontNegotiableQuoteSendMainSection.quoteNumber}}" userInput="{$grabQuoteFromUrl}" stepKey="seeQuoteNumber"/>
+        <see selector="{{StorefrontNegotiableQuoteSendMainSection.quoteMerchant}}" userInput="{{NegotiableQuoteMessages.quoteToTheMerchantMessage}}" stepKey="seeSuccessQuoteMerchant"/>
+    </actionGroup>
+</actionGroups>

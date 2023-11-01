@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontPurchaseOrderViewSection">
+        <element name="purchaseOrderStatus" type="text" selector="//span[@id='purchase-order-status-field'][contains(., '{{purchaseOrderStatus}}')]" parameterized="true" timeout="30"/>
+        <element name="purchaseOrderOrderLink" type="text" selector="//a[@title='View Order']" timeout="30"/>
+        <element name="purchaseOrderApproveButton" type="text" selector="//div[@class='po-action-toolbar']//button[contains(.,'Approve Purchase Order')]" timeout="10"/>
+        <element name="purchaseOrderRejectButton" type="text" selector="//div[@class='po-action-toolbar']//button[contains(.,'Reject Purchase Order')]" timeout="10"/>
+        <element name="purchaseOrderCancelButton" type="text" selector="//div[@class='po-action-toolbar']//button[contains(.,'Cancel Purchase Order')]" timeout="10"/>
+        <element name="placeOrderButton" type="text" selector="//div[@class='po-action-toolbar']//button[contains(.,'Place Order')]" timeout="10"/>
+        <element name="placeOrderBanner" type="text" selector="//div[contains(@class,'page-title-wrapper')]/div[contains(@class,'message')]/span" timeout="10"/>
+        <element name="placeOrderBannerLink" type="text" selector="//div[contains(@class,'message')]/span[contains(text(),'To proceed with this order, go to')]/a[text()='Place Order']" timeout="10"/>
+        <element name="placeOrderBannerError" type="text" selector=".page-title-wrapper .message.error" timeout="10"/>
+        <element name="productItemErrorBySKU" type="text" selector="//td[contains(@class,'sku') and contains(.,'{{sku}}')]/ancestor::tr//td[contains(@class,'item')]//div[contains(@class,'error')]//.." parameterized="true" timeout="10"/>
+        <element name="purchaseOrderItemsTab" type="button" selector=".purchase-order-data-items .items-quoted[data-role='collapsible']" timeout="10"/>
+        <element name="viewNegotiableQuoteLink" type="text" selector="//div[@id='negotiable-quote-name']/a[@title='View Negotiable Quote']" timeout="10" />
+        <element name="purchaseOrderGrandTotal" type="text" selector="#shopping-cart-table-totals tr.grand_total span.price"/>
+        <element name="paymentMethod" type="text" selector=".box-order-billing-method .box-content"/>
+        <element name="addItemToShoppingCart" type="text" selector=".action.additem"/>
+        <element name="cancelButton" type="text" selector=".action.cancel.secondary span"/>
+        <element name="mergeButton" type="button" selector=".action.merge.primary span"/>
+        <element name="replaceButton" type="button" selector=".action.replace span"/>
+        <element name="orderNumber" type="text" selector="//div[@id='order-number']/a/span"/>
+        <element name="purchaseOrderNumberInTitle" type="text" selector="//h1/span[contains(.,'{{purchaseOrderId}}')]" parameterized="true" />
+        <element name="commentTextarea" type="input" selector=".block-comments .comments-field-control textarea[name='comment']" />
+        <element name="addCommentButton" type="button" selector=".block-comments button[type='submit']" />
+        <element name="addCommentButtonDisabled" type="button" selector=".block-comments button[type='submit'][disabled]" />
+        <element name="paypalExpressExceptionMessage" type="text" selector="//input[@id='paypal_express']/../..//div[contains(@class, 'message-error')][contains(., '{{message}}')]"  parameterized="true" timeout="10"/>
+    </section>
+</sections>

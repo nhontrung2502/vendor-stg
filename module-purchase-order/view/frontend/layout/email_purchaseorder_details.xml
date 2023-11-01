@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      label="Email Purchase Order Items List" design_abstraction="custom">
+    <body>
+        <!-- Purchase Order Details -->
+        <block class="Magento\Framework\View\Element\Template"
+               name="purchase.order.email.details"
+               template="Magento_PurchaseOrder::purchaseorder/view/email/details.phtml">
+
+            <!-- Title -->
+            <block class="Magento\PurchaseOrder\Block\PurchaseOrder\Info\Title"
+                   name="purchase.order.email.title"
+                   template="Magento_PurchaseOrder::purchaseorder/view/email/title.phtml"/>
+
+            <!-- Shipping -->
+            <block class="Magento\PurchaseOrder\Block\PurchaseOrder\Info\Shipping"
+                   name="purchase.order.email.shipping"
+                   template="Magento_PurchaseOrder::purchaseorder/view/email/shipping.phtml"/>
+
+            <!-- Items -->
+            <block class="Magento\PurchaseOrder\Block\PurchaseOrder\Items"
+                   name="purchase.order.email.items"
+                   template="Magento_PurchaseOrder::purchaseorder/view/email/items.phtml" cacheable="false">
+                <block class="Magento\Framework\View\Element\RendererList"
+                       name="checkout.cart.item.renderers" as="renderer.list">
+                    <block class="Magento\Checkout\Block\Cart\Item\Renderer"
+                           name="checkout.cart.item.renderers.default" as="default"
+                           template="Magento_PurchaseOrder::purchaseorder/view/email/items/default.phtml">
+                        <arguments>
+                            <argument name="view_model" xsi:type="object">
+                                Magento\PurchaseOrder\ViewModel\Quote\Items
+                            </argument>
+                        </arguments>
+                        <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions"
+                               name="checkout.cart.item.renderers.default.actions" as="actions"/>
+                    </block>
+                    <block class="Magento\ConfigurableProduct\Block\Cart\Item\Renderer\Configurable"
+                           name="checkout.cart.item.renderers.configurable" as="configurable"
+                           template="Magento_PurchaseOrder::purchaseorder/view/email/items/default.phtml">
+                        <arguments>
+                            <argument name="view_model" xsi:type="object">
+                                Magento\PurchaseOrder\ViewModel\Quote\Items
+                            </argument>
+                        </arguments>
+                        <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions"
+                               name="checkout.cart.item.renderers.configurable.actions" as="actions"/>
+                    </block>
+                    <block class="Magento\GroupedProduct\Block\Cart\Item\Renderer\Grouped"
+                           name="checkout.cart.item.renderers.grouped" as="grouped"
+                           template="Magento_PurchaseOrder::purchaseorder/view/email/items/default.phtml">
+                        <arguments>
+                            <argument name="view_model" xsi:type="object">
+                                Magento\PurchaseOrder\ViewModel\Quote\Items
+                            </argument>
+                        </arguments>
+                        <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions"
+                               name="checkout.cart.item.renderers.grouped.actions" as="actions"/>
+                    </block>
+                    <block class="Magento\Downloadable\Block\Checkout\Cart\Item\Renderer"
+                           name="checkout.cart.item.renderers.downloadable" as="downloadable"
+                           template="Magento_PurchaseOrder::purchaseorder/view/email/items/default.phtml">
+                        <arguments>
+                            <argument name="view_model" xsi:type="object">
+                                Magento\PurchaseOrder\ViewModel\Quote\Items
+                            </argument>
+                        </arguments>
+                        <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions"
+                               name="checkout.cart.item.renderers.downloadable.actions" as="actions"/>
+                    </block>
+                </block>
+
+                <!-- Totals -->
+                <block class="Magento\PurchaseOrder\Block\PurchaseOrder\EmailTotals"
+                       name="purchase.order.email.totals"
+                       template="Magento_PurchaseOrder::purchaseorder/view/email/totals.phtml">
+                    <block class="Magento\PurchaseOrder\Block\PurchaseOrder\Totals\Giftcards"
+                           name="purchase.order.totals.giftcards"
+                           template="Magento_PurchaseOrder::purchaseorder/view/email/totals/giftcards.phtml"/>
+                </block>
+            </block>
+        </block>
+    </body>
+</page>

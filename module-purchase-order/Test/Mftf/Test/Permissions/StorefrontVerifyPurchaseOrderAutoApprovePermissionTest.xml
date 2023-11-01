@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontVerifyPurchaseOrderAutoApprovePermissionTest">
+        <annotations>
+            <features value="Purchase Orders"/>
+            <stories value="Permissions"/>
+            <title value="Verify Purchase Order Auto-Approve Permission"/>
+            <description value="Verify that purchase orders require approval if the creator does not have the
+            auto-approve permission. Verify purchase orders are approved automatically if the purchase order creator
+            has the auto-approve permission."/>
+            <severity value="BLOCKER"/>
+            <testCaseId value="MC-32886"/>
+            <useCaseId value="B2B-360"/>
+            <group value="purchase_orders"/>
+        </annotations>
+        <before>
+            <createData entity="Simple_US_Customer" stepKey="createPurchaseOrderCustomer"/>
+            <createData entity="CustomerEntityOne" stepKey="createCompanyAdmin"/>
+            <createData entity="Default_Company" stepKey="createCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="SimpleSubCategory" stepKey="category"/>
+            <createData entity="SimpleProductForPurchaseOrder_Price_987_65" stepKey="product1">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+            <!-- Enable Company Order Approvals -->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createCompany.id$"/>
+                <argument name="companyName" value="$createCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminEnablePurchaseOrderForCompanyActionGroup" stepKey="enablePurchaseOrderForCompany"/>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="saveCompany"/>
+            <!-- Assign Second Customer to Company -->
+            <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerEditPage">
+                <argument name="customerId" value="$$createPurchaseOrderCustomer.id$"/>
+            </actionGroup>
+            <actionGroup ref="AdminAddACompanyToCustomerActionGroup" stepKey="assignCustomerToCompany">
+                <argument name="companyName" value="$$createCompany.company_name$$"/>
+            </actionGroup>
+            <!-- Enable View Purchase Orders Permission -->
+            <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+                <argument name="Customer" value="$$createCompanyAdmin$$"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontNavigateToRolesAndPermissionsPageActionGroup" stepKey="navigateToRolesAndPermissionsPage"/>
+            <actionGroup ref="StorefrontClickEditForRoleInRolesGridActionGroup" stepKey="clickEditForRoleInRolesGrid">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableViewPurchaseOrdersPermission">
+                <argument name="permissionId" value="Magento_PurchaseOrder::view_purchase_orders"/>
+            </actionGroup>
+            <actionGroup ref="StorefrontSaveCompanyRoleActionGroup" stepKey="saveCompanyRole">
+                <argument name="roleName" value="Default User"/>
+            </actionGroup>
+            <!-- Logout as Company Admin -->
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCompanyAdmin"/>
+        </before>
+        <after>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutStorefront"/>
+            <deleteData createDataKey="createCompany" stepKey="deleteCompany"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteAdminCustomer"/>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <deleteData createDataKey="product1" stepKey="deleteProduct1"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+            <comment userInput="BIC workaround" stepKey="storefrontCustomerLogout"/>
+        </after>
+        <!-- Create Purchase Order -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser">
+            <argument name="Customer" value="$$createPurchaseOrderCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart"/>
+        <!-- Complete Checkout -->
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMoneyOrder"/>
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder"/>
+        <generateDate date="now" format="M j, Y, g:" stepKey="poSubmittedTime"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderId"/>
+        <!-- Verify Purchase Order Requires Approval -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApprovalRequired">
+            <argument name="status" value="{{PurchaseOrderStatuses.approvalRequired}}"/>
+        </actionGroup>
+        <!-- Verify Purchase Order Status in History tab -->
+        <actionGroup ref="StorefrontNavigateToPurchaseOrderHistoryLogTabActionGroup" stepKey="NavigateToHistoryLogTab"/>
+        <actionGroup ref="StorefrontVerifyHistoryLogMessageActionGroup" stepKey="checkCreatePurchaseOrderHistoryLog">
+            <argument name="index" value="1"/>
+            <argument name="logMessage" value='Purchase Order #$purchaseOrderId was Submitted By {{Simple_US_Customer.fullname}}'/>
+            <argument name="date" value="{$poSubmittedTime}"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutPurchaser"/>
+        <!-- Enable Auto-Approve Purchase Orders Permission -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginCompanyAdmin">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontNavigateToRolesAndPermissionsPageActionGroup" stepKey="navigateToRolesAndPermissionsPage"/>
+        <actionGroup ref="StorefrontClickEditForRoleInRolesGridActionGroup" stepKey="clickEditForRoleInRolesGrid">
+            <argument name="roleName" value="Default User"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontToggleCompanyRolePermissionActionGroup" stepKey="enableAutoApprovePermission">
+            <argument name="permissionId" value="Magento_PurchaseOrder::autoapprove_purchase_order"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontSaveCompanyRoleActionGroup" stepKey="saveCompanyRole">
+            <argument name="roleName" value="Default User"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutAdmin"/>
+        <!-- Login and Create Second Purchase Order -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginPurchaser2">
+            <argument name="Customer" value="$$createPurchaseOrderCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="gotToProduct1Page2">
+            <argument name="product" value="$$product1$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProduct1ToCart2"/>
+        <!-- Complete Checkout -->
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="navigateToCheckoutPage2"/>
+        <actionGroup ref="StorefrontSetShippingMethodActionGroup" stepKey="selectFirstShippingMethod2"/>
+        <actionGroup ref="StorefrontCheckoutClickNextOnShippingStepActionGroup" stepKey="clickNextOnShippingStep2"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMoneyOrder2"/>
+        <actionGroup ref="StorefrontCheckoutClickPlacePurchaseOrderActionGroup" stepKey="clickPlacePurchaseOrder2"/>
+        <actionGroup ref="StorefrontValidateSuccessfulPurchaseOrderSubmittalActionGroup" stepKey="validateSuccessfulPurchaseOrder2"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderSuccessSection.purchaseOrderNumber}}" stepKey="purchaseOrderId2"/>
+        <generateDate date="now" format="M j, Y, g:" stepKey="poApprovedTime"/>
+        <!-- Verify Purchase Order is Approved -->
+        <actionGroup ref="StorefrontClickPurchaseOrderLinkFromSuccessfulPurchaseOrderPageActionGroup" stepKey="clickPurchaseOrderLink2"/>
+        <actionGroup ref="StorefrontValidatePurchaseOrderStatusActionGroup" stepKey="validatePurchaseOrderApproved">
+            <argument name="status" value="{{PurchaseOrderStatuses.approved}}"/>
+        </actionGroup>
+        <!-- Verify Purchase Order Status in History tab -->
+        <actionGroup ref="StorefrontNavigateToPurchaseOrderHistoryLogTabActionGroup" stepKey="NavigateToHistoryLogTab2"/>
+        <actionGroup ref="StorefrontVerifyHistoryLogMessageActionGroup" stepKey="checkAutoApproveHistoryLog">
+            <argument name="index" value="1"/>
+            <argument name="logMessage" value='Purchase Order #$purchaseOrderId2 was automatically approved'/>
+            <argument name="date" value="{$poApprovedTime}"/>
+        </actionGroup>
+    </test>
+</tests>

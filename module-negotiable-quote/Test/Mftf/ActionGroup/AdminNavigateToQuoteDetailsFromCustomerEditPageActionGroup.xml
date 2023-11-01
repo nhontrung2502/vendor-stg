@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminNavigateToQuoteDetailsFromCustomerEditPageActionGroup">
+        <annotations>
+            <description>Navigate to quote details from customer edit page</description>
+        </annotations>
+        <arguments>
+          <argument name="index" defaultValue="1" type="string"/>
+          <argument name="quoteName" defaultValue="" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{AdminCustomerQuotesGridSection.viewAction(index)}}" stepKey="waitForRowViewAction"/>
+        <click selector="{{AdminCustomerQuotesGridSection.viewAction(index)}}" stepKey="clickRowViewAction"/>
+        <waitForPageLoad stepKey="waitForQuotesDetailPage"/>
+        <waitForText selector="{{AdminNegotiableQuoteViewSection.quoteName}}" userInput="{{quoteName}}" stepKey="seeOpenedQuote"/>
+    </actionGroup>
+</actionGroups>

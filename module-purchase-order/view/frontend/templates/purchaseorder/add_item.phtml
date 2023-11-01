@@ -1,0 +1,36 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $escaper \Magento\Framework\Escaper */
+?>
+
+<div id="add-item-quote-popup" data-mage-init='{"Magento_PurchaseOrder/js/model/create-quote-popup": {}}'
+     data-role="add-item-quote-popup" class="modal-container add-item-quote-popup">
+        <fieldset class="fieldset info">
+            <div class="field quote-add-item-message">
+                <p class="text-main"></p>
+                <p class="text-secondary"></p>
+            </div>
+        </fieldset>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action merge primary" data-action="merge-quote"
+                        title="<?= $escaper->escapeHtmlAttr(__('Merge')) ?>">
+                    <span><?= $escaper->escapeHtml(__('Merge')) ?></span>
+                </button>
+                <button class="action replace" data-action="replace-quote"
+                        title="<?= $escaper->escapeHtmlAttr(__('Replace')) ?>">
+                    <span><?= $escaper->escapeHtml(__('Replace')) ?></span>
+                </button>
+            </div>
+            <div class="secondary">
+                <button class="action cancel secondary" data-action="close-modal"
+                        title="<?= $escaper->escapeHtmlAttr(__('Cancel')) ?>">
+                    <span><?= $escaper->escapeHtml(__('Cancel')) ?></span>
+                </button>
+            </div>
+        </div>
+</div>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminViewQuotesFromCustomerEditTest">
+        <annotations>
+            <features value="Negotiable Quotes"/>
+            <stories value="Customer Edit Page"/>
+            <title value="Verify Quotes Tab in Admin for Customer Edit Page"/>
+            <description value="Verify merchant can view quotes created by a customer from the Customer Edit page"/>
+            <severity value="CRITICAL"/>
+            <group value="negotiable_quotes"/>
+            <group value="customer"/>
+        </annotations>
+        <before>
+            <magentoCLI command="config:set {{EnableCompanyConfigData.path}} {{EnableCompanyConfigData.value}}" stepKey="enableCompany"/>
+            <magentoCLI command="config:set {{EnableB2BQuoteConfigData.path}} {{EnableB2BQuoteConfigData.value}}" stepKey="enableB2BQuote"/>
+            <createData entity="NewAdminUser" stepKey="createAdminUser"/>
+            <createData entity="Simple_US_Customer" stepKey="createCompanyAdmin"/>
+            <createData entity="Default_Company" stepKey="createDefaultCompany">
+                <requiredEntity createDataKey="createCompanyAdmin"/>
+            </createData>
+            <createData entity="_defaultCategory" stepKey="createCategory"/>
+            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminOpenCompanyEditPageActionGroup" stepKey="openCompanyEditPage">
+                <argument name="companyId" value="$createDefaultCompany.id$"/>
+                <argument name="companyName" value="$createDefaultCompany.company_name$"/>
+            </actionGroup>
+            <actionGroup ref="AdminFillCompanyGeneralInformationActionGroup" stepKey="fillCompanyGeneralInformation">
+                <argument name="companyName" value="$createDefaultCompany.company_name$"/>
+                <argument name="companyStatus" value="$createDefaultCompany.status$"/>
+                <argument name="companyEmail" value="$createDefaultCompany.company_email$"/>
+                <argument name="companySalesRepresentative" value="$createAdminUser.username$"/>
+            </actionGroup>
+            <actionGroup ref="AdminCompanySaveActionGroup" stepKey="saveCompany"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logoutAsAdmin"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set {{DisableCompanyConfigData.path}} {{DisableCompanyConfigData.value}}" stepKey="disableCompany"/>
+            <magentoCLI command="config:set {{DisableB2BQuoteConfigData.path}} {{DisableB2BQuoteConfigData.value}}" stepKey="disableB2BQuote"/>
+            <deleteData createDataKey="createDefaultCompany" stepKey="deleteDefaultCompany"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <deleteData createDataKey="createSimpleProduct" stepKey="deleteSimpleProduct"/>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup"  stepKey="customerLogout"/>
+            <deleteData createDataKey="createCompanyAdmin" stepKey="deleteCompanyAdmin"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logoutAsAdmin"/>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminDeleteCustomUserActionGroup" stepKey="deleteUser">
+                <argument name="user" value="NewAdminUser"/>
+            </actionGroup>
+            <actionGroup ref="ClearFiltersAdminDataGridActionGroup" stepKey="resetUserFilters"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logoutAsAdminUser"/>
+        </after>
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="customerLogin">
+            <argument name="Customer" value="$$createCompanyAdmin$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="openProductPage">
+            <argument name="product" value="$$createSimpleProduct$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProductToCart"/>
+        <actionGroup ref="StorefrontCartPageOpenActionGroup" stepKey="onPageShoppingCart"/>
+        <actionGroup ref="StorefrontRequestQuoteActionGroup" stepKey="requestQuote">
+            <argument name="quote" value="DefaultNegotiableQuote"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenNegotiableQuoteActionGroup" stepKey="storefrontOpenNegotiableQuote">
+            <argument name="quoteName" value="{{DefaultNegotiableQuote.name}}"/>
+        </actionGroup>
+        <generateDate date="now" format="M j, Y" stepKey="quoteRequestedTime"/>
+        <grabFromCurrentUrl regex="~/quote_id/(\d+)/~" stepKey="quoteNo"/>
+        <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+        <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerEditPage">
+            <argument name="customerId" value="$createCompanyAdmin.id$"/>
+        </actionGroup>
+        <actionGroup ref="AdminOpenQuotesTabFromCustomerEditPageActionGroup" stepKey="openQuotesTabFromCustomerEditPage"/>
+        <actionGroup ref="AdminValidateQuotesRowInGridActionGroup" stepKey="validateQuotesRowInGrid">
+            <argument name="quoteNo" value="{$quoteNo}"/>
+            <argument name="createdDate" value="{$quoteRequestedTime}"/>
+            <argument name="lastUpdate" value="{$quoteRequestedTime}"/>
+            <argument name="salesRep" value="$$createAdminUser.firstname$$ $$createAdminUser.lastname$$"/>
+            <argument name="baseQuoteTotal" value="${{SimpleProduct.price}}"/>
+            <argument name="status" value="New"/>
+            <argument name="negotiatedQuoteTotal" value="${{SimpleProduct.price}}"/>
+        </actionGroup>
+        <actionGroup ref="AdminNavigateToQuoteDetailsFromCustomerEditPageActionGroup" stepKey="openQuoteDetailsFromCustomerEditPage">
+            <argument name="quoteName" value="{{DefaultNegotiableQuote.name}}"/>
+        </actionGroup>
+        <moveBack stepKey="moveBack"/>
+        <actionGroup ref="AdminOpenQuotesTabFromCustomerEditPageActionGroup" stepKey="openQuotesTabFromCustomerEditPageAfterMoveBack"/>
+    </test>
+</tests>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontNegotiableQuoteSelectCustomerAddressAsShippingAddressActionGroup">
+        <annotations>
+            <description>You are on the Storefront Negotiable Quote view page, select shipping address and press 'Save' button</description>
+        </annotations>
+        <arguments>
+            <argument name="addressSearchTerm" type="string" defaultValue="Los Angeles"/>
+        </arguments>
+        <scrollTo selector="{{StorefrontNegotiableQuoteViewSection.selectExistingAddressButton}}" stepKey="scrollToSelectExistingAddressButton"/>
+        <click selector="{{StorefrontNegotiableQuoteViewSection.selectExistingAddressButton}}" stepKey="clickSelectExistingAddressButton"/>
+        <waitForElementVisible selector="{{StorefrontNegotiableQuoteChangeAddressSection.selectQuoteAddress}}" stepKey="waitForselectQuoteAddressVisible"/>
+        <selectOption selector="{{StorefrontNegotiableQuoteChangeAddressSection.selectQuoteAddress}}" userInput="{{addressSearchTerm}}" stepKey="selectShippingAddress"/>
+        <click selector="{{StorefrontNegotiableQuoteChangeAddressSection.saveAddressButton}}" stepKey="clickSaveAddressButton"/>
+        <waitForElementVisible selector="{{StorefrontNegotiableQuoteViewSection.noticeMessage}}" stepKey="waitForElementVisible"/>
+        <see selector="{{StorefrontNegotiableQuoteViewSection.noticeMessage}}" userInput="{{NegotiableQuoteMessages.addedOrChangedTheShippingAddressMessage}}" stepKey="seeNoticeMessage"/>
+        <see selector="{{StorefrontNegotiableQuoteViewSection.quoteShippingAddress}}" userInput="{{addressSearchTerm}}" stepKey="seeAddress"/>
+    </actionGroup>
+</actionGroups>

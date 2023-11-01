@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontNavigateToViewPurchaseOrderPageActionGroup">
+        <annotations>
+            <description>Navigates to the View Purchase Order page for a specified Purchase Order on the storefront using the UI. Must be on the My Purchase Orders page on storefront.</description>
+        </annotations>
+        <arguments>
+            <argument name="purchaseOrderNumber" defaultValue="" type="string"/>
+            <argument name="tabName" defaultValue="my" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRowActionView(tabName, purchaseOrderNumber)}}" stepKey="waitForViewButton"/>
+        <click selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRowActionView(tabName, purchaseOrderNumber)}}" stepKey="clickViewButton"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <waitForElementVisible selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" stepKey="waitForPageTitle"/>
+        <see selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" userInput="Purchase Order # {{purchaseOrderNumber}}" stepKey="seePageTitle"/>
+    </actionGroup>
+</actionGroups>

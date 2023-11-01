@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontValidatePurchaseOrderCreatedDateAndUpdatedDateInGridActionGroup">
+        <annotations>
+            <description>Validates that the created and updated dates in the Purchase Order grid on the storefront acceptably match the expected created and updated dates</description>
+        </annotations>
+        <arguments>
+            <argument name="gridName" defaultValue="company" type="string"/>
+            <argument name="purchaseOrderNumber" defaultValue="" type="string"/>
+            <argument name="expectedCreatedTime" defaultValue="" type="string"/>
+            <argument name="expectedUpdatedTime" defaultValue="" type="string"/>
+            <argument name="acceptableOffset" defaultValue="10" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRowCreatedTime(gridName, purchaseOrderNumber)}}" stepKey="waitForCreatedTime"/>
+        <waitForElementVisible selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRowUpdatedTime(gridName, purchaseOrderNumber)}}" stepKey="waitForUpdatedTime"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRowCreatedTime(gridName, purchaseOrderNumber)}}" stepKey="createdTimeGrid"/>
+        <grabTextFrom selector="{{StorefrontPurchaseOrderGridSection.purchaseOrderRowUpdatedTime(gridName, purchaseOrderNumber)}}" stepKey="updatedTimeGrid"/>
+        <!-- The below returns true if $expectedCreatedTime minus $createdTimeGrid is less than $acceptableOffset -->
+        <!-- This is necessary to account for the time it may take between when Magento creates the purchase order and when the test runs the generateDate command -->
+        <executeJS function="return Math.abs(new Date('{{expectedCreatedTime}}') - new Date('{$createdTimeGrid}'))/1000 &lt; {{acceptableOffset}}" stepKey="acceptableCreatedTimeDifference"/>
+        <!-- Same as above but for updated date -->
+        <executeJS function="return Math.abs(new Date('{{expectedUpdatedTime}}') - new Date('{$updatedTimeGrid}'))/1000 &lt; {{acceptableOffset}}" stepKey="acceptableUpdatedTimeDifference"/>
+        <assertTrue stepKey="assertCreatedDateAcceptable">
+            <actualResult type="variable">acceptableCreatedTimeDifference</actualResult>
+        </assertTrue>
+        <assertTrue stepKey="assertUpdatedDateAcceptable">
+            <actualResult type="variable">acceptableUpdatedTimeDifference</actualResult>
+        </assertTrue>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAssertProductInQuoteActionGroup">
+        <arguments>
+            <argument name="product" type="entity"/>
+            <argument name="qty" type="string"/>
+            <argument name="price" type="string"/>
+        </arguments>
+        <see userInput="{{product.name}}" selector="{{AdminNegotiableQuoteItemSection.productNameRow}}" stepKey="seeNameProduct"/>
+        <see userInput="{{product.sku}}" selector="{{AdminNegotiableQuoteItemSection.productSKURow}}" stepKey="seeSKU"/>
+        <grabValueFrom selector="{{AdminNegotiableQuoteItemSection.productQty(product.name)}}" stepKey="grabQty"/>
+        <assertEquals stepKey="assertProductQty">
+			<actualResult type="const">$grabQty</actualResult>
+			<expectedResult type="const">{{qty}}</expectedResult>
+        </assertEquals>
+        <see userInput="{{price}}" selector="{{AdminNegotiableQuoteItemSection.productPrice(product.name)}}" stepKey="seePrice"/>
+    </actionGroup>
+</actionGroups>

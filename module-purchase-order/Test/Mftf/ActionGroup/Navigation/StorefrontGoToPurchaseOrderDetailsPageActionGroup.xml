@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontGoToPurchaseOrderDetailsPageActionGroup">
+        <annotations>
+            <description>Goes to the storefront View Purchase Order details page for the provided purchase order id.</description>
+        </annotations>
+        <arguments>
+            <argument name="purchaseOrderId" type="string"/>
+            <argument name="purchaseOrderNumber" defaultValue="{{DefaultNegotiableQuote.name}}" type="string"/>
+        </arguments>
+        <amOnPage url="{{StorefrontPurchaseOrderViewPage.url(purchaseOrderId)}}" stepKey="goToPurchaseOrderPage"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <waitForText selector="{{StorefrontCustomerAccountMainSection.pageTitle}}" userInput="Purchase Order # {{purchaseOrderNumber}}" stepKey="waitForPageTitle"/>
+    </actionGroup>
+</actionGroups>
