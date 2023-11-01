@@ -2,7 +2,6 @@
 
 The **Magento Data Services Multishipping Module** is responsible for brokering data needed to train machine learning models and build out Magento data-driven features such as Product Recommendations.
 
-
 ## Documentation
 Please use this [link](docs) to access the latest Product Recommendations documentation.
 
